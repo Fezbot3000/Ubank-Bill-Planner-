@@ -40,21 +40,22 @@
             <h2>Your Financial Overview</h2>
             <button onclick="toggleBillList()">Hide/Show Bill List</button>
             <button onclick="openModal()">Add a Bill</button>
+            <button onclick="openIncomeModal()">Edit Income</button>
             <table id="incomeTable">
                 <tr>
                     <th>Income Frequency</th>
-                    <th>Income Amount</th>
+                    <th class="right-align">Income Amount</th>
                     <th>Next Pay Day</th>
-                    <th>Yearly Income</th>
+                    <th class="right-align">Yearly Income</th>
                 </tr>
             </table>
             <table id="billsTable">
                 <tr>
                     <th>Bill Name</th>
-                    <th>Bill Amount</th>
+                    <th class="right-align">Bill Amount</th>
                     <th>Bill Frequency</th>
                     <th>Next Due Date</th>
-                    <th>12-Monthly Total Amount</th>
+                    <th class="right-align">12-Monthly Total Amount</th>
                     <th>Actions</th>
                 </tr>
             </table>
@@ -67,7 +68,7 @@
         <canvas id="financialChart"></canvas>
     </div>
 
-    <!-- Modal Structure -->
+    <!-- Bill Modal Structure -->
     <div id="billModal" class="modal">
         <div class="modal-content">
             <span class="close" onclick="closeModal()">&times;</span>
@@ -87,6 +88,26 @@
                 <label for="billDate">Next Due Date:</label>
                 <input type="date" id="billDate" name="billDate" required>
                 <button type="submit" id="submitBill">Add Bill</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Income Modal Structure -->
+    <div id="incomeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeIncomeModal()">&times;</span>
+            <form id="incomeEditForm">
+                <label for="editFrequency">How often do you get paid?</label>
+                <select id="editFrequency" name="editFrequency" required>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+                <label for="editIncome">How much do you get paid in that period?</label>
+                <input type="number" step="0.01" id="editIncome" name="editIncome" required>
+                <label for="editPayday">When is your next pay day?</label>
+                <input type="date" id="editPayday" name="editPayday" required>
+                <button type="button" onclick="updateIncome()">Save</button>
             </form>
         </div>
     </div>

@@ -17,7 +17,7 @@ function goToStep2() {
     payday = document.getElementById('payday').value;
     const yearlyIncome = calculateYearlyIncome(payFrequency, income);
 
-    document.getElementById('incomeTable').innerHTML += `<tr><td>${payFrequency}</td><td>$${income.toFixed(2)}</td><td>${new Date(payday).toLocaleDateString()}</td><td>$${yearlyIncome.toFixed(2)}</td></tr>`;
+    document.getElementById('incomeTable').innerHTML += `<tr><td>${payFrequency}</td><td class="right-align">$${income.toFixed(2)}</td><td>${new Date(payday).toLocaleDateString()}</td><td class="right-align">$${yearlyIncome.toFixed(2)}</td></tr>`;
     document.getElementById('step1').classList.add('hidden');
     document.getElementById('step2').classList.remove('hidden');
     saveToLocalStorage();
@@ -61,14 +61,14 @@ document.getElementById('billsForm').addEventListener('submit', function(event) 
 function updateBillsTable() {
     const billsTable = document.getElementById('billsTable');
     let totalYearlyAmount = 0;
-    billsTable.innerHTML = `<tr><th>Bill Name</th><th>Bill Amount</th><th>Bill Frequency</th><th>Next Due Date</th><th>12-Monthly Total Amount</th><th>Actions</th></tr>`;
+    billsTable.innerHTML = `<tr><th>Bill Name</th><th class="right-align">Bill Amount</th><th>Bill Frequency</th><th>Next Due Date</th><th class="right-align">12-Monthly Total Amount</th><th>Actions</th></tr>`;
     bills.forEach((bill, index) => {
         const yearlyAmount = calculateYearlyAmount(bill.amount, bill.frequency);
         totalYearlyAmount += yearlyAmount;
-        billsTable.innerHTML += `<tr><td>${bill.name}</td><td class="bills negative">-$${bill.amount.toFixed(2)}</td><td>${bill.frequency}</td><td>${new Date(bill.date).toLocaleDateString()}</td><td>-$${yearlyAmount.toFixed(2)}</td><td><button class="edit-btn" onclick="editBill(${index})">Edit</button></td></tr>`;
+        billsTable.innerHTML += `<tr><td>${bill.name}</td><td class="bills negative right-align">-$${bill.amount.toFixed(2)}</td><td>${bill.frequency}</td><td>${new Date(bill.date).toLocaleDateString()}</td><td class="right-align">-$${yearlyAmount.toFixed(2)}</td><td><button class="edit-btn" onclick="editBill(${index})">Edit</button></td></tr>`;
     });
     const totalRow = document.createElement('tr');
-    totalRow.innerHTML = `<td colspan="4"><strong>Total Yearly Amount:</strong></td><td><strong>-$${totalYearlyAmount.toFixed(2)}</strong></td><td></td>`;
+    totalRow.innerHTML = `<td colspan="4"><strong>Total Yearly Amount:</strong></td><td class="right-align"><strong>-$${totalYearlyAmount.toFixed(2)}</strong></td><td></td>`;
     billsTable.appendChild(totalRow);
 }
 
@@ -147,7 +147,8 @@ function updateAccordion() {
             cycleTotal += getBillTotalForCycle(bill, dates);
         });
         const leftoverAmount = income - cycleTotal;
-        accordionContainer.innerHTML += `<button class="accordion">${dates.start.toDateString()} - ${dates.end.toDateString()}<span class="leftover">Leftover: $${leftoverAmount.toFixed(2)}</span></button><div class="panel"><div class="pay-cycle"><table><tr><td colspan="2">Income:</td><td class="positive">$${income.toFixed(2)}</td></tr><tr><td colspan="2">Total Bills:</td><td class="negative">-$${cycleTotal.toFixed(2)}</td></tr>${cycleBills}</table></div></div>`;
+        const leftoverClass = leftoverAmount >= 0 ? 'positive' : 'negative';
+        accordionContainer.innerHTML += `<button class="accordion">${dates.start.toDateString()} - ${dates.end.toDateString()}<span class="leftover ${leftoverClass} right-align">Leftover: $${leftoverAmount.toFixed(2)}</span></button><div class="panel"><div class="pay-cycle"><table><tr><td colspan="2">Income:</td><td class="positive right-align">$${income.toFixed(2)}</td></tr><tr><td colspan="2">Total Bills:</td><td class="negative right-align">-$${cycleTotal.toFixed(2)}</td></tr>${cycleBills}</table></div></div>`;
         chartData.dates.push(dates.start.toDateString());
         chartData.totals.push(cycleTotal);
     });
@@ -191,13 +192,15 @@ function getBillRowsForCycle(bill, dates) {
     let rows = '',
         billDueDate = new Date(bill.date);
     if (bill.frequency === 'yearly') {
-        if (billDueDate >= dates.start && billDueDate <= dates.end) {
-            rows += `<tr><td>${bill.name}</td><td>${billDueDate.toDateString()}</td><td class="bills negative">-$${bill.amount.toFixed(2)}</td></tr>`;
+        if (billDueDate >= dates.start && billDueDate <= dates.end)
+
+{
+            rows += `<tr><td>${bill.name}</td><td>${billDueDate.toDateString()}</td><td class="bills negative right-align">-$${bill.amount.toFixed(2)}</td></tr>`;
         }
     } else {
         while (billDueDate <= dates.end) {
             if (billDueDate >= dates.start && billDueDate <= dates.end) {
-                rows += `<tr><td>${bill.name}</td><td>${billDueDate.toDateString()}</td><td class="bills negative">-$${bill.amount.toFixed(2)}</td></tr>`;
+                rows += `<tr><td>${bill.name}</td><td>${billDueDate.toDateString()}</td><td class="bills negative right-align">-$${bill.amount.toFixed(2)}</td></tr>`;
             }
             billDueDate = getNextBillDate(billDueDate, bill.frequency);
         }
@@ -286,7 +289,7 @@ function updateChart(chartData) {
 function resetLocalStorage() {
     if (confirm('Are you sure you want to reset all data? This action cannot be undone.')) {
         localStorage.clear();
-        location.reload();
+        window.location.href = window.location.href;
     }
 }
 
@@ -299,16 +302,38 @@ function closeModal() {
     document.getElementById('billModal').style.display = 'none';
 }
 
+function openIncomeModal() {
+    document.getElementById('editFrequency').value = payFrequency;
+    document.getElementById('editIncome').value = income;
+    document.getElementById('editPayday').value = payday;
+    document.getElementById('incomeModal').style.display = 'block';
+}
+
+function closeIncomeModal() {
+    document.getElementById('incomeModal').style.display = 'none';
+}
+
+function updateIncome() {
+    payFrequency = document.getElementById('editFrequency').value;
+    income = parseFloat(document.getElementById('editIncome').value);
+    payday = document.getElementById('editPayday').value;
+    saveToLocalStorage();
+    location.reload();
+}
+
 window.onclick = function(event) {
     if (event.target == document.getElementById('billModal')) {
         closeModal();
+    }
+    if (event.target == document.getElementById('incomeModal')) {
+        closeIncomeModal();
     }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
     if (income) {
         const yearlyIncome = calculateYearlyIncome(payFrequency, income);
-        document.getElementById('incomeTable').innerHTML += `<tr><td>${payFrequency}</td><td>$${income.toFixed(2)}</td><td>${new Date(payday).toLocaleDateString()}</td><td>$${yearlyIncome.toFixed(2)}</td></tr>`;
+        document.getElementById('incomeTable').innerHTML += `<tr><td>${payFrequency}</td><td class="right-align">$${income.toFixed(2)}</td><td>${new Date(payday).toLocaleDateString()}</td><td class="right-align">$${yearlyIncome.toFixed(2)}</td></tr>`;
         document.getElementById('step1').classList.add('hidden');
         document.getElementById('step2').classList.remove('hidden');
     }

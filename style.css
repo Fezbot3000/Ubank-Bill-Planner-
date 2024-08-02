@@ -1,161 +1,147 @@
+/* General Styles */
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: white;
-    color: black;
-    text-align: center;
-}
-
-.container {
-    width: 80%;
-    margin: 0 auto;
-}
-
-.form-container, .table-container, .chart-container {
-    margin-top: 20px;
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    background-color: #f5f5f5;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
 h1 {
-    font-size: 36px;
-    font-weight: 700;
+    text-align: center;
+    margin: 20px 0;
+    color: #333;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
-h2 {
-    font-size: 24px;
-    font-weight: 700;
-}
-
-label {
-    display: block;
-    margin-top: 10px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-input[type="text"], input[type="number"], input[type="date"], select {
-    width: 100%;
-    max-width: 300px;
-    padding: 8px;
-    margin-top: 5px;
-    font-size: 14px;
-    font-weight: 500;
-    box-sizing: border-box;
-    display: block;
-    margin: 5px auto;
-}
-
-button {
-    margin-top: 20px;
-    padding: 10px 20px;
-    font-size: 14px;
-    font-weight: 500;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    cursor: pointer;
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    background: #fff;
     border-radius: 8px;
-    display: block;
-    margin: 20px auto;
-}
-
-button:hover {
-    background-color: #0056b3;
-}
-
-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 20px;
-}
-
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-th {
-    background-color: #f2f2f2;
-    color: black;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
 .hidden {
     display: none;
 }
 
-.accordion {
-    background-color: #ffca28;
-    color: black;
+button {
+    margin: 10px 0;
+    padding: 10px 20px;
+    font-size: 16px;
+    font-weight: 300 !important;
     cursor: pointer;
-    padding: 18px;
+    background-color: #007BFF;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.table-container {
+    margin-top: 20px;
+}
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 12px;
+    text-align: left;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+.bills.negative {
+    color: red;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+.accordion {
+    background-color: #f2f2f2;
+    color: #444;
+    cursor: pointer;
+    padding: 10px;
     width: 100%;
     border: none;
     text-align: left;
     outline: none;
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.active, .accordion:hover {
-    background-color: #ffd54f;
-}
-
-.panel {
-    padding: 0 18px;
-    background-color: white;
-    display: none;
-    overflow: hidden;
-    font-size: 14px;
-    font-weight: 500;
-    text-align: left;
-}
-
-.bill-name, .dates, .bills, .total {
-    font-size: 14px;
-    font-weight: 500;
-}
-
-.leftover {
-    float: right;
-}
-
-.chart-container {
-    margin-top: 20px;
-}
-
-canvas {
-    width: 100%;
-    height: 400px;
-}
-
-.pay-cycle {
-    text-align: left;
-}
-
-.pay-cycle .income, .pay-cycle .total, .pay-cycle .bills {
+    font-size: 16px;
+    font-weight: 300 !important;
+    transition: background-color 0.3s;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
-.pay-cycle .income .amount, .pay-cycle .total .amount, .pay-cycle .bills .amount {
+.accordion.active, .accordion:hover {
+    background-color: #ddd;
+}
+
+.panel {
+    padding: 0 10px;
+    background-color: white;
+    display: none;
+    overflow: hidden;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+/* Right align class */
+.right-align {
     text-align: right;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
-.pay-cycle .dates, .pay-cycle .bill-name {
-    text-align: left;
-}
-
-.panel .positive {
+/* Positive and Negative classes */
+.positive {
     color: green;
-    text-align: right;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
-.panel .negative {
+.negative {
     color: red;
-    text-align: right;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
-/* Modal styles */
+
+/* Chart Container */
+.chart-container {
+    margin: 20px auto;
+    max-width: 800px;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -168,6 +154,8 @@ canvas {
     background-color: rgb(0,0,0);
     background-color: rgba(0,0,0,0.4);
     padding-top: 60px;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
 .modal-content {
@@ -177,6 +165,9 @@ canvas {
     border: 1px solid #888;
     width: 80%;
     max-width: 500px;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 300 !important;
 }
 
 .close {
@@ -191,4 +182,68 @@ canvas {
     color: black;
     text-decoration: none;
     cursor: pointer;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+/* Form Styles */
+form label {
+    display: block;
+    margin: 15px 0 5px;
+    font-weight: 300 !important;
+    color: #333;
+    font-size: 16px;
+}
+
+form input[type="text"],
+form input[type="number"],
+form input[type="date"],
+form select {
+    width: calc(100% - 24px);
+    padding: 10px;
+    margin: 5px 0 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+form button {
+    margin-top: 10px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+form button[type="submit"] {
+    background-color: #28a745;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+form button[type="submit"]:hover {
+    background-color: #218838;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+form button[type="button"] {
+    background-color: #007BFF;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+form button[type="button"]:hover {
+    background-color: #0056b3;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+/* Income Table Styles */
+#incomeTable {
+    margin-top: 20px;
+    background-color: #fff;
+    border-radius: 8px;
+    font-size: 40px !important;
+    font-weight: 300 !important;
 }
