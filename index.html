@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" >
+<head>
+  <meta charset="UTF-8">
+  <title>CodePen - A Pen by Mark Twain</title>
+  <link rel="stylesheet" href="./style.css">
+
+</head>
+<body>
+<!-- partial:index.partial.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <button onclick="resetLocalStorage()">Reset Data</button>
+    <h1>Budgeting Tool</h1>
+    <div class="container">
+        <div class="form-container" id="step1">
+            <form id="incomeForm">
+                <label for="frequency">How often do you get paid?</label>
+                <select id="frequency" name="frequency" required>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                </select>
+                <label for="income">How much do you get paid in that period?</label>
+                <input type="number" step="0.01" id="income" name="income" required>
+                <label for="payday">When is your next pay day?</label>
+                <input type="date" id="payday" name="payday" required>
+                <button type="button" onclick="goToStep2()">Next Step</button>
+            </form>
+        </div>
+        <div class="table-container hidden" id="step2">
+            <h2>Your Financial Overview</h2>
+            <button onclick="toggleBillList()">Hide/Show Bill List</button>
+            <button onclick="openModal()">Add a Bill</button>
+            <table id="incomeTable">
+                <tr>
+                    <th>Income Frequency</th>
+                    <th>Income Amount</th>
+                    <th>Next Pay Day</th>
+                    <th>Yearly Income</th>
+                </tr>
+            </table>
+            <table id="billsTable">
+                <tr>
+                    <th>Bill Name</th>
+                    <th>Bill Amount</th>
+                    <th>Bill Frequency</th>
+                    <th>Next Due Date</th>
+                    <th>12-Monthly Total Amount</th>
+                    <th>Actions</th>
+                </tr>
+            </table>
+            <div id="accordionContainer"></div>
+            <button onclick="loadMorePayCycles()">Load 3 More Pay Cycles</button>
+            <div id="yearlyBillsSection"></div>
+        </div>
+    </div>
+    <div class="chart-container">
+        <canvas id="financialChart"></canvas>
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="billModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <form id="billsForm">
+                <input type="hidden" id="billIndex" name="billIndex">
+                <label for="billName">Bill Name:</label>
+                <input type="text" id="billName" name="billName" required>
+                <label for="billAmount">Bill Amount:</label>
+                <input type="number" step="0.01" id="billAmount" name="billAmount" required>
+                <label for="billFrequency">Bill Frequency:</label>
+                <select id="billFrequency" name="billFrequency" required>
+                    <option value="weekly">Weekly</option>
+                    <option value="fortnightly">Fortnightly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+                <label for="billDate">Next Due Date:</label>
+                <input type="date" id="billDate" name="billDate" required>
+                <button type="submit" id="submitBill">Add Bill</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+<!-- partial -->
+  <script  src="./script.js"></script>
+
+</body>
+</html>
