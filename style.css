@@ -84,7 +84,7 @@ th {
 }
 
 .accordion {
-    background-color: #f2f2f2;
+    background-color: rgb(245, 191, 60);
     color: #444;
     cursor: pointer;
     padding: 10px;
@@ -101,7 +101,16 @@ th {
 }
 
 .accordion.active, .accordion:hover {
-    background-color: #ddd;
+    background-color: #f5d25e;
+}
+
+.accordion .arrow {
+    margin-left: 10px;
+    transition: transform 0.3s;
+}
+
+.accordion.active .arrow {
+    transform: rotate(90deg);
 }
 
 .panel {
@@ -244,6 +253,116 @@ form button[type="button"]:hover {
     margin-top: 20px;
     background-color: #fff;
     border-radius: 8px;
-    font-size: 40px !important;
+    font-size: 16px;
     font-weight: 300 !important;
+}
+
+#incomeTable th, #incomeTable td {
+    font-weight: 300 !important;
+}
+
+/* View Mode Container */
+.view-mode-container {
+    text-align: right;
+    margin-top: 10px;
+}
+
+.view-mode-container label {
+    margin-right: 10px;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+.view-mode-container select {
+    padding: 5px;
+    font-size: 16px;
+    font-weight: 300 !important;
+}
+
+/* Total Amount Styles */
+.total-label {
+    font-weight: bold;
+}
+
+.total-amount {
+    font-weight: bold;
+}
+
+/* Responsive Styles */
+@media (max-width: 768px) {
+    body {
+        font-size: 14px;
+    }
+
+    .container {
+        padding: 10px;
+    }
+
+    button {
+        padding: 8px 16px;
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .accordion {
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    .view-mode-container {
+        text-align: left;
+    }
+
+    .modal-content {
+        width: 90%;
+    }
+
+    form input[type="text"],
+    form input[type="number"],
+    form input[type="date"],
+    form select {
+        width: calc(100% - 20px);
+        padding: 8px;
+        font-size: 14px;
+    }
+
+    form button {
+        font-size: 14px;
+        padding: 8px;
+    }
+
+    .chart-container {
+        margin: 10px auto;
+        font-size: 14px;
+    }
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 14px;
+        margin: 15px 0;
+    }
+
+    button {
+        width: 100%;
+        margin: 5px 0;
+    }
+
+    .accordion {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .accordion .arrow {
+        margin-left: 0;
+        margin-top: 5px;
+    }
+
+    .table-container {
+        overflow-x: auto;
+    }
 }
