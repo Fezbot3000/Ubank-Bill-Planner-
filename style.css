@@ -310,6 +310,12 @@ button[type="submit"]:hover {
 }
 
 /* Styling for View Mode dropdown */
+.view-mode {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 20px;
+}
+
 .view-mode select {
     background: url('data:image/svg+xml;utf8,<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"></path></svg>') no-repeat right 10px center;
     background-size: 10px; /* Smaller arrow */
