@@ -48,13 +48,6 @@
             <div class="table-container hidden" id="step2">
                 <div class="controls">
                     <h2>Your Financial Overview</h2>
-                    <div class="view-mode">
-                        <label for="viewMode">View Mode:</label>
-                        <select id="viewMode" onchange="toggleViewMode()">
-                            <option value="payCycle">Pay Cycle View</option>
-                            <option value="monthly">Month-to-Month View</option>
-                        </select>
-                    </div>
                     <div class="buttons">
                         <div class="left-buttons">
                             <button class="secondary-btn" onclick="toggleBillList()">Hide/Show Bill List</button>
@@ -83,6 +76,13 @@
                         <th>Actions</th>
                     </tr>
                 </table>
+                <div class="view-mode">
+                    <label for="viewMode">View Mode:</label>
+                    <select id="viewMode" onchange="toggleViewMode()">
+                        <option value="payCycle">Pay Cycle View</option>
+                        <option value="monthly">Month-to-Month View</option>
+                    </select>
+                </div>
                 <div id="accordionContainer"></div>
                 <button class="primary-btn" onclick="loadMorePayCycles()">Load 3 More Pay Cycles</button>
                 <div id="yearlyBillsSection"></div>
