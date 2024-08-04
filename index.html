@@ -14,66 +14,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Budgeting Tool</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <button onclick="resetLocalStorage()">Reset Data</button>
-    <h1>Budgeting Tool</h1>
     <div class="container">
-        <div class="form-container" id="step1">
-            <form id="incomeForm">
-                <label for="frequency">How often do you get paid?</label>
-                <select id="frequency" name="frequency" required>
-                    <option value="weekly">Weekly</option>
-                    <option value="fortnightly">Fortnightly</option>
-                    <option value="monthly">Monthly</option>
-                </select>
-                <label for="income">How much do you get paid in that period?</label>
-                <input type="number" step="0.01" id="income" name="income" required>
-                <label for="payday">When is your next pay day?</label>
-                <input type="date" id="payday" name="payday" required>
-                <button type="button" onclick="goToStep2()">Next Step</button>
-            </form>
-        </div>
-        <div class="table-container hidden" id="step2">
-            <h2>Your Financial Overview</h2>
-            <button onclick="toggleBillList()">Hide/Show Bill List</button>
-            <button onclick="openModal()">Add a Bill</button>
-            <button onclick="openIncomeModal()">Edit Income</button>
-            <div class="view-mode-container">
-                <label for="viewMode">View Mode:</label>
-                <select id="viewMode" onchange="toggleViewMode()">
-                    <option value="payCycle">Pay Cycle View</option>
-                    <option value="monthly">Month-to-Month View</option>
-                </select>
+        <header>
+            <h1>Budgeting Tool</h1>
+            <button class="reset-btn" onclick="resetLocalStorage()">Reset Data</button>
+        </header>
+        <main>
+            <div class="form-container" id="step1">
+                <form id="incomeForm">
+                    <div class="form-group">
+                        <label for="frequency">How often do you get paid?</label>
+                        <select id="frequency" name="frequency" required>
+                            <option value="weekly">Weekly</option>
+                            <option value="fortnightly">Fortnightly</option>
+                            <option value="monthly">Monthly</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="income">How much do you get paid in that period?</label>
+                        <input type="number" step="0.01" id="income" name="income" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="payday">When is your next pay day?</label>
+                        <input type="date" id="payday" name="payday" required>
+                    </div>
+                    <button type="button" class="next-btn" onclick="goToStep2()">Next Step</button>
+                </form>
             </div>
-            <table id="incomeTable">
-                <tr>
-                    <th>Income Frequency</th>
-                    <th class="right-align">Income Amount</th>
-                    <th>Next Pay Day</th>
-                    <th class="right-align">Yearly Income</th>
-                </tr>
-            </table>
-            <table id="billsTable">
-                <tr>
-                    <th>Bill Name</th>
-                    <th class="right-align">Bill Amount</th>
-                    <th>Bill Frequency</th>
-                    <th>Next Due Date</th>
-                    <th class="right-align">12-Monthly Total Amount</th>
-                    <th>Actions</th>
-                </tr>
-            </table>
-            <div id="accordionContainer"></div>
-            <button onclick="loadMorePayCycles()">Load 3 More Pay Cycles</button>
-            <div id="yearlyBillsSection"></div>
-            <div id="yearlyBillsAmount"></div>
-        </div>
-    </div>
-    <div class="chart-container">
-        <canvas id="financialChart"></canvas>
+            <div class="table-container hidden" id="step2">
+                <div class="controls">
+                    <h2>Your Financial Overview</h2>
+                    <div class="buttons">
+                        <button class="secondary-btn" onclick="toggleBillList()">Hide/Show Bill List</button>
+                        <button class="primary-btn" onclick="openModal()">Add a Bill</button>
+                        <button class="secondary-btn" onclick="openIncomeModal()">Edit Income</button>
+                    </div>
+                </div>
+                <table id="incomeTable">
+                    <tr>
+                        <th>Income Frequency</th>
+                        <th class="right-align">Income Amount</th>
+                        <th>Next Pay Day</th>
+                        <th class="right-align">Yearly Income</th>
+                    </tr>
+                </table>
+                <table id="billsTable">
+                    <tr>
+                        <th>Bill Name</th>
+                        <th class="right-align">Bill Amount</th>
+                        <th>Bill Frequency</th>
+                        <th>Next Due Date</th>
+                        <th class="right-align">12-Monthly Total Amount</th>
+                        <th>Actions</th>
+                    </tr>
+                </table>
+                <div class="view-mode">
+                    <label for="viewMode">View Mode:</label>
+                    <select id="viewMode" onchange="toggleViewMode()">
+                        <option value="payCycle">Pay Cycle View</option>
+                        <option value="monthly">Month-to-Month View</option>
+                    </select>
+                </div>
+                <div id="accordionContainer"></div>
+                <button class="load-more-btn" onclick="loadMorePayCycles()">Load 3 More Pay Cycles</button>
+                <div id="yearlyBillsSection"></div>
+            </div>
+            <div class="chart-container">
+                <canvas id="financialChart"></canvas>
+            </div>
+        </main>
     </div>
 
     <!-- Bill Modal Structure -->
@@ -82,19 +95,27 @@
             <span class="close" onclick="closeModal()">&times;</span>
             <form id="billsForm">
                 <input type="hidden" id="billIndex" name="billIndex">
-                <label for="billName">Bill Name:</label>
-                <input type="text" id="billName" name="billName" required>
-                <label for="billAmount">Bill Amount:</label>
-                <input type="number" step="0.01" id="billAmount" name="billAmount" required>
-                <label for="billFrequency">Bill Frequency:</label>
-                <select id="billFrequency" name="billFrequency" required>
-                    <option value="weekly">Weekly</option>
-                    <option value="fortnightly">Fortnightly</option>
-                    <option value="monthly">Monthly</option>
-                    <option value="yearly">Yearly</option>
-                </select>
-                <label for="billDate">Next Due Date:</label>
-                <input type="date" id="billDate" name="billDate" required>
+                <div class="form-group">
+                    <label for="billName">Bill Name:</label>
+                    <input type="text" id="billName" name="billName" required>
+                </div>
+                <div class="form-group">
+                    <label for="billAmount">Bill Amount:</label>
+                    <input type="number" step="0.01" id="billAmount" name="billAmount" required>
+                </div>
+                <div class="form-group">
+                    <label for="billFrequency">Bill Frequency:</label>
+                    <select id="billFrequency" name="billFrequency" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="yearly">Yearly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="billDate">Next Due Date:</label>
+                    <input type="date" id="billDate" name="billDate" required>
+                </div>
                 <button type="submit" id="submitBill">Add Bill</button>
             </form>
         </div>
@@ -105,16 +126,22 @@
         <div class="modal-content">
             <span class="close" onclick="closeIncomeModal()">&times;</span>
             <form id="incomeEditForm">
-                <label for="editFrequency">How often do you get paid?</label>
-                <select id="editFrequency" name="editFrequency" required>
-                    <option value="weekly">Weekly</option>
-                    <option value="fortnightly">Fortnightly</option>
-                    <option value="monthly">Monthly</option>
-                </select>
-                <label for="editIncome">How much do you get paid in that period?</label>
-                <input type="number" step="0.01" id="editIncome" name="editIncome" required>
-                <label for="editPayday">When is your next pay day?</label>
-                <input type="date" id="editPayday" name="editPayday" required>
+                <div class="form-group">
+                    <label for="editFrequency">How often do you get paid?</label>
+                    <select id="editFrequency" name="editFrequency" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editIncome">How much do you get paid in that period?</label>
+                    <input type="number" step="0.01" id="editIncome" name="editIncome" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPayday">When is your next pay day?</label>
+                    <input type="date" id="editPayday" name="editPayday" required>
+                </div>
                 <button type="button" onclick="updateIncome()">Save</button>
             </form>
         </div>

@@ -1,30 +1,55 @@
 /* General Styles */
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Roboto', sans-serif;
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     background-color: #f5f5f5;
     font-size: 16px;
-    font-weight: 300 !important;
 }
 
 h1 {
     text-align: center;
     margin: 20px 0;
     color: #333;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
 .container {
-    max-width: 800px;
+    max-width: 900px;
     margin: 0 auto;
     padding: 20px;
     background: #fff;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 300 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 24px;
+}
+
+header .reset-btn {
+    background-color: #f44336;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+header .reset-btn:hover {
+    background-color: #d32f2f;
+}
+
+.main {
+    margin-top: 20px;
 }
 
 .hidden {
@@ -35,17 +60,67 @@ button {
     margin: 10px 0;
     padding: 10px 20px;
     font-size: 16px;
-    font-weight: 300 !important;
     cursor: pointer;
-    background-color: #007BFF;
-    color: #fff;
     border: none;
     border-radius: 4px;
     transition: background-color 0.3s;
+    white-space: nowrap; /* Ensure text stays on one line */
 }
 
 button:hover {
+    background-color: #1565c0;
+}
+
+.secondary-btn {
+    background-color: #fff;
+    color: #007bff;
+    border: 2px solid #007bff; /* Match primary button color */
+}
+
+.secondary-btn:hover {
+    background-color: #f0f8ff;
+}
+
+.primary-btn {
+    background-color: #007bff;
+    color: #fff;
+}
+
+.primary-btn:hover {
     background-color: #0056b3;
+}
+
+.delete-btn {
+    background-color: #fff;
+    color: #f44336;
+    border: 2px solid #f44336; /* Match reset button color */
+}
+
+.delete-btn:hover {
+    background-color: #fdecea;
+}
+
+.form-container {
+    margin-bottom: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
 }
 
 .table-container {
@@ -58,59 +133,58 @@ table {
     margin-bottom: 20px;
     background-color: #fff;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 300 !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
 th, td {
     border: 1px solid #ddd;
     padding: 12px;
     text-align: left;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
 th {
-    background-color: #f2f2f2;
+    background-color: #f5f5f5;
     color: #333;
-    font-size: 16px;
-    font-weight: 300 !important;
+    font-weight: 500;
 }
 
 .bills.negative {
-    color: red;
-    font-size: 16px;
-    font-weight: 300 !important;
+    color: #f44336; /* Match reset button color */
 }
 
 .accordion {
-    background-color: rgb(245, 191, 60);
-    color: #444;
+    background-color: #f5f5f5;
+    color: #333;
     cursor: pointer;
     padding: 10px;
     width: 100%;
-    border: none;
+    border: 1px solid #ddd;
     text-align: left;
     outline: none;
     font-size: 16px;
-    font-weight: 300 !important;
-    transition: background-color 0.3s;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
-.accordion.active, .accordion:hover {
-    background-color: #f5d25e;
+.accordion .leftover {
+    margin-left: auto; /* Ensure the leftover amount is pushed to the right */
+    color: #333; /* Same color as rest of the text */
+}
+
+.accordion .leftover .amount {
+    color: green; /* Green color for the dollar amount */
 }
 
 .accordion .arrow {
-    margin-left: 10px;
-    transition: transform 0.3s;
+    margin-left: 10px; /* Space between leftover amount and arrow */
 }
 
-.accordion.active .arrow {
-    transform: rotate(90deg);
+.accordion.active, .accordion:hover {
+    background-color: #e5e5e5;
 }
 
 .panel {
@@ -118,36 +192,25 @@ th {
     background-color: white;
     display: none;
     overflow: hidden;
-    font-size: 16px;
-    font-weight: 300 !important;
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
-/* Right align class */
 .right-align {
     text-align: right;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
-/* Positive and Negative classes */
 .positive {
     color: green;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
 .negative {
-    color: red;
-    font-size: 16px;
-    font-weight: 300 !important;
+    color: #f44336; /* Match reset button color */
 }
 
-/* Chart Container */
 .chart-container {
     margin: 20px auto;
     max-width: 800px;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
 /* Modal Styles */
@@ -160,23 +223,19 @@ th {
     width: 100%;
     height: 100%;
     overflow: auto;
-    background-color: rgb(0,0,0);
-    background-color: rgba(0,0,0,0.4);
+    background-color: rgba(0, 0, 0, 0.4);
     padding-top: 60px;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
 .modal-content {
-    background-color: #fefefe;
+    background-color: #fff;
     margin: 5% auto;
     padding: 20px;
     border: 1px solid #888;
     width: 80%;
     max-width: 500px;
     border-radius: 8px;
-    font-size: 16px;
-    font-weight: 300 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
 .close {
@@ -184,185 +243,33 @@ th {
     float: right;
     font-size: 28px;
     font-weight: bold;
+    cursor: pointer;
 }
 
 .close:hover,
 .close:focus {
     color: black;
     text-decoration: none;
-    cursor: pointer;
-    font-size: 16px;
-    font-weight: 300 !important;
 }
 
-/* Form Styles */
-form label {
-    display: block;
-    margin: 15px 0 5px;
-    font-weight: 300 !important;
-    color: #333;
-    font-size: 16px;
+.buttons {
+    display: flex;
+    gap: 10px;
 }
 
-form input[type="text"],
-form input[type="number"],
-form input[type="date"],
-form select {
-    width: calc(100% - 24px);
-    padding: 10px;
-    margin: 5px 0 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    font-size: 16px;
-    font-weight: 300 !important;
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-form button {
-    margin-top: 10px;
-    width: 100%;
-    font-size: 16px;
-    font-weight: 300 !important;
+.view-mode {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
 }
 
-form button[type="submit"] {
-    background-color: #28a745;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-form button[type="submit"]:hover {
-    background-color: #218838;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-form button[type="button"] {
-    background-color: #007BFF;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-form button[type="button"]:hover {
-    background-color: #0056b3;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-/* Income Table Styles */
-#incomeTable {
-    margin-top: 20px;
-    background-color: #fff;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-#incomeTable th, #incomeTable td {
-    font-weight: 300 !important;
-}
-
-/* View Mode Container */
-.view-mode-container {
-    text-align: right;
-    margin-top: 10px;
-}
-
-.view-mode-container label {
+.view-mode label {
     margin-right: 10px;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-.view-mode-container select {
-    padding: 5px;
-    font-size: 16px;
-    font-weight: 300 !important;
-}
-
-/* Total Amount Styles */
-.total-label {
-    font-weight: bold;
-}
-
-.total-amount {
-    font-weight: bold;
-}
-
-/* Responsive Styles */
-@media (max-width: 768px) {
-    body {
-        font-size: 14px;
-    }
-
-    .container {
-        padding: 10px;
-    }
-
-    button {
-        padding: 8px 16px;
-        font-size: 14px;
-    }
-
-    th, td {
-        padding: 8px;
-        font-size: 14px;
-    }
-
-    .accordion {
-        padding: 8px;
-        font-size: 14px;
-    }
-
-    .view-mode-container {
-        text-align: left;
-    }
-
-    .modal-content {
-        width: 90%;
-    }
-
-    form input[type="text"],
-    form input[type="number"],
-    form input[type="date"],
-    form select {
-        width: calc(100% - 20px);
-        padding: 8px;
-        font-size: 14px;
-    }
-
-    form button {
-        font-size: 14px;
-        padding: 8px;
-    }
-
-    .chart-container {
-        margin: 10px auto;
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 480px) {
-    h1 {
-        font-size: 14px;
-        margin: 15px 0;
-    }
-
-    button {
-        width: 100%;
-        margin: 5px 0;
-    }
-
-    .accordion {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .accordion .arrow {
-        margin-left: 0;
-        margin-top: 5px;
-    }
-
-    .table-container {
-        overflow-x: auto;
-    }
 }
