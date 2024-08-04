@@ -313,7 +313,13 @@ button[type="submit"]:hover {
 .view-mode {
     display: flex;
     justify-content: flex-end;
+    align-items: center;
     margin-top: 20px;
+}
+
+.view-mode label {
+    margin-right: 10px;
+    font-size: 14px;
 }
 
 .view-mode select {

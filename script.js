@@ -108,7 +108,8 @@ function updateBillsTable() {
     const billsTable = document.getElementById('billsTable');
     let totalYearlyAmount = 0;
     billsTable.innerHTML = `<tr><th>Bill Name</th><th class="right-align">Bill Amount</th><th>Bill Frequency</th><th>Next Due Date</th><th class="right-align">12-Monthly Total Amount</th><th>Actions</th></tr>`;
-    bills.forEach((bill, index) => {
+    const sortedBills = sortBillsByDate(bills);
+    sortedBills.forEach((bill, index) => {
         const yearlyAmount = calculateYearlyAmount(bill.amount, bill.frequency);
         totalYearlyAmount += yearlyAmount;
         billsTable.innerHTML += `<tr><td>${bill.name}</td><td class="bills negative right-align">-$${bill.amount.toFixed(2)}</td><td>${bill.frequency}</td><td>${new Date(bill.date).toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: '2-digit', year: 'numeric' })}</td><td class="right-align">-$${yearlyAmount.toFixed(2)}</td><td><button class="secondary-btn" onclick="editBill(${index})">Edit</button> <button class="delete-btn" onclick="removeBill(${index})">Delete</button></td></tr>`;
@@ -185,7 +186,8 @@ function updateAccordion() {
             if (index >= revealedPayCycles) return;
             let cycleTotal = 0,
                 cycleBills = '';
-            bills.forEach(bill => {
+            const sortedBills = sortBillsByDate(bills);
+            sortedBills.forEach(bill => {
                 cycleBills += getBillRowsForCycle(bill, dates);
                 cycleTotal += getBillTotalForCycle(bill, dates);
             });
@@ -231,6 +233,10 @@ function updateAccordion() {
     });
 
     updateChart(chartData);
+}
+
+function sortBillsByDate(bills) {
+    return bills.sort((a, b) => new Date(a.date) - new Date(b.date));
 }
 
 function getCycleLength(frequency) {
@@ -326,7 +332,8 @@ function calculateMonthlyView() {
         });
 
         // Calculate total bills for the month
-        bills.forEach(bill => {
+        const sortedBills = sortBillsByDate(bills);
+        sortedBills.forEach(bill => {
             let billDueDate = new Date(bill.date);
             while (billDueDate <= endDate) {
                 if (billDueDate >= startDate && billDueDate <= endDate) {
