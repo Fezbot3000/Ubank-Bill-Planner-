@@ -72,13 +72,15 @@ button:hover {
 }
 
 .secondary-btn {
-    background-color: #fff;
+    background-color: transparent;
     color: #007bff;
-    border: 2px solid #007bff; /* Match primary button color */
+    text-decoration: underline;
+    border: none;
 }
 
 .secondary-btn:hover {
-    background-color: #f0f8ff;
+    color: white;
+    background-color: #007bff; /* Match primary button color */
 }
 
 .primary-btn {
@@ -112,6 +114,7 @@ button:hover {
     display: block;
     margin-bottom: 5px;
     font-weight: 500;
+    padding-bottom: 10px; /* Add padding below the form field headings */
 }
 
 .form-group input,
@@ -121,6 +124,18 @@ button:hover {
     border: 1px solid #ddd;
     border-radius: 4px;
     font-size: 16px;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    box-sizing: border-box;
+}
+
+.form-group select {
+    background: url('data:image/svg+xml;utf8,<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"></path></svg>') no-repeat right 10px center;
+    background-size: 15px; /* Make the arrow smaller */
+    background-position: right 10px center; /* Adjust the position of the arrow */
+    background-color: #fff;
+    padding-right: 30px;
 }
 
 .table-container {
@@ -132,7 +147,6 @@ table {
     border-collapse: collapse;
     margin-bottom: 20px;
     background-color: #fff;
-    border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
 }
 
@@ -153,10 +167,10 @@ th {
 }
 
 .accordion {
-    background-color: #f5f5f5;
-    color: #333;
+    background-color: #f5f5f5; /* Match the background color of the income frequency table */
+    color: #333; /* Ensure text is readable */
     cursor: pointer;
-    padding: 10px;
+    padding: 12px; /* Match the padding of the table cells */
     width: 100%;
     border: 1px solid #ddd;
     text-align: left;
@@ -165,9 +179,10 @@ th {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-radius: 8px;
+    border-radius: 4px; /* Match the border-radius of other elements */
     margin-bottom: 10px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    height: auto; /* Ensure height matches the table row height */
 }
 
 .accordion .leftover {
@@ -176,7 +191,7 @@ th {
 }
 
 .accordion .leftover .amount {
-    color: green; /* Green color for the dollar amount */
+    color: #333; /* Ensure the amount is readable */
 }
 
 .accordion .arrow {
@@ -184,7 +199,7 @@ th {
 }
 
 .accordion.active, .accordion:hover {
-    background-color: #e5e5e5;
+    background-color: #e5e5e5; /* Slightly darker grey on hover */
 }
 
 .panel {
@@ -238,7 +253,7 @@ th {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.close {
+.modal-content .close {
     color: #aaa;
     float: right;
     font-size: 28px;
@@ -246,30 +261,65 @@ th {
     cursor: pointer;
 }
 
-.close:hover,
-.close:focus {
+.modal-content .close:hover,
+.modal-content .close:focus {
     color: black;
     text-decoration: none;
 }
 
+.modal-content form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.modal-content form .form-group {
+    display: flex;
+    flex-direction: column;
+}
+
+button[type="submit"] {
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    white-space: nowrap; /* Ensure text stays on one line */
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
 .buttons {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.buttons .left-buttons {
     display: flex;
     gap: 10px;
 }
 
-.controls {
+.buttons .right-buttons {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
+    gap: 10px;
 }
 
-.view-mode {
-    display: flex;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.view-mode label {
-    margin-right: 10px;
+/* Styling for View Mode dropdown */
+.view-mode select {
+    background: url('data:image/svg+xml;utf8,<svg fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path d="M6 9l6 6 6-6"></path></svg>') no-repeat right 10px center;
+    background-size: 10px; /* Smaller arrow */
+    background-position: right 10px center; /* Adjust the position of the arrow */
+    padding-right: 20px; /* Adjust padding to make room for the smaller arrow */
+    font-size: 14px; /* Adjust font size if needed */
+    border: 1px solid #ddd; /* Ensure consistent border */
+    border-radius: 4px; /* Ensure consistent border-radius */
+    padding: 10px; /* Consistent padding */
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
 }

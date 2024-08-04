@@ -42,16 +42,27 @@
                         <label for="payday">When is your next pay day?</label>
                         <input type="date" id="payday" name="payday" required>
                     </div>
-                    <button type="button" class="next-btn" onclick="goToStep2()">Next Step</button>
+                    <button type="button" class="primary-btn" onclick="goToStep2()">Next Step</button>
                 </form>
             </div>
             <div class="table-container hidden" id="step2">
                 <div class="controls">
                     <h2>Your Financial Overview</h2>
+                    <div class="view-mode">
+                        <label for="viewMode">View Mode:</label>
+                        <select id="viewMode" onchange="toggleViewMode()">
+                            <option value="payCycle">Pay Cycle View</option>
+                            <option value="monthly">Month-to-Month View</option>
+                        </select>
+                    </div>
                     <div class="buttons">
-                        <button class="secondary-btn" onclick="toggleBillList()">Hide/Show Bill List</button>
-                        <button class="primary-btn" onclick="openModal()">Add a Bill</button>
-                        <button class="secondary-btn" onclick="openIncomeModal()">Edit Income</button>
+                        <div class="left-buttons">
+                            <button class="secondary-btn" onclick="toggleBillList()">Hide/Show Bill List</button>
+                            <button class="secondary-btn" onclick="openIncomeModal()">Edit Income</button>
+                        </div>
+                        <div class="right-buttons">
+                            <button class="primary-btn" onclick="openModal()">Add a Bill</button>
+                        </div>
                     </div>
                 </div>
                 <table id="incomeTable">
@@ -72,15 +83,8 @@
                         <th>Actions</th>
                     </tr>
                 </table>
-                <div class="view-mode">
-                    <label for="viewMode">View Mode:</label>
-                    <select id="viewMode" onchange="toggleViewMode()">
-                        <option value="payCycle">Pay Cycle View</option>
-                        <option value="monthly">Month-to-Month View</option>
-                    </select>
-                </div>
                 <div id="accordionContainer"></div>
-                <button class="load-more-btn" onclick="loadMorePayCycles()">Load 3 More Pay Cycles</button>
+                <button class="primary-btn" onclick="loadMorePayCycles()">Load 3 More Pay Cycles</button>
                 <div id="yearlyBillsSection"></div>
             </div>
             <div class="chart-container">
@@ -116,7 +120,7 @@
                     <label for="billDate">Next Due Date:</label>
                     <input type="date" id="billDate" name="billDate" required>
                 </div>
-                <button type="submit" id="submitBill">Add Bill</button>
+                <button type="submit" id="submitBill" class="primary-btn">Add Bill</button>
             </form>
         </div>
     </div>
@@ -142,7 +146,7 @@
                     <label for="editPayday">When is your next pay day?</label>
                     <input type="date" id="editPayday" name="editPayday" required>
                 </div>
-                <button type="button" onclick="updateIncome()">Save</button>
+                <button type="button" class="primary-btn" onclick="updateIncome()">Save</button>
             </form>
         </div>
     </div>
