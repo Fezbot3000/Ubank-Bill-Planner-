@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style2.css">
+     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- Required meta tags for iOS web app -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons for the web app -->
+    <link rel="apple-touch-icon" href="path/to/your-icon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="path/to/your-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="path/to/your-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="path/to/your-icon.png">
+
+</head>
+<body>
+    <div class="container">
+   
+     <div class="main-container">
+       
+       
+        <div style=" padding-bottom: 5rem; ">
+          <div class="midbox">
+            <div class="box">
+                <div class="box1">
+                    <div class="img-container">
+                        <img src="img/bill.svg"/>
+                    </div>
+                    <div class="title-container">
+                        <h3>Yr. Income</h3>
+                        <span>Total pay over 12 months</span>
+                    </div>
+                    <div class="cycle">
+                        <span id="yearlyIncomeAmount" class="price-data">$ 121,547.92</span>
+                    </div>
+                </div>
+                <div class="box1">
+                    <div class="img-container">
+                        <img src="img/bills.svg"/>
+                    </div>
+                    <div class="title-container">
+                        <h3>Yr. Bills</h3>
+                        <span>Total bills over 12 months</span>
+                    </div>
+                    <div class="cycle">
+                        <span id="yearlyBillsAmount" class="price-data price-danger">-$ 85,622.04</span>
+                    </div>
+                </div>
+                <div class="box1">
+                    <div class="img-container">
+                        <img src="img/savings.svg"/>
+                    </div>
+                    <div class="title-container">
+                        <h3>Yr. Savings</h3>
+                        <span>Total savings over 12 months</span>
+                    </div>
+                    <div class="cycle">
+                        <span id="yearlySavingsAmount" class="price-data price-success">$ 35,925.88</span>
+                    </div>
+                </div>
+            </div>
+            <!-- ---  -->
+            <div class="box">
+                <div class="box1">
+                    <div class="img-container">
+                        <img src="img/cal.svg"/>
+                    </div>
+                    <div class="title-container">
+                        <h3>Frequency</h3>
+                        <span>How Frequently you get paid</span>
+                    </div>
+                    <div class="cycle">
+                        <h2 id="incomeFrequency">Fortnightly</h2>
+                    </div>
+                </div>
+                <div class="box1">
+                    <div class="img-container">
+                        <img style="opacity: 0;" src="img/cal.svg"/>
+                    </div>
+                    <div class="title-container">
+                        <h3>Income</h3>
+                        <span>How much you get paid</span>
+                    </div>
+                    <div class="cycle">
+                        <span id="incomeAmount" class="price-data">$ 4674.92</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="settings-menu">
+                <ul class="sett">
+                    <li>
+                        <a href="#" onclick="exportData()">
+                            <span class="menu-icon">
+                                <img src="img/ex1.svg"/>
+                            </span>
+                            <span class="menu-txt">
+                                Export data
+                            </span>
+                        </a>
+                    </li>
+                    <input type="file" id="importFile" style="display:none;" onchange="importData(event)">
+                    <li>
+                        <a href="#" onclick="document.getElementById('importFile').click()">
+                            <span class="menu-icon">
+                                <img src="img/ex2.svg"/>
+                            </span>
+                            <span class="menu-txt">
+                                Import data
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="resetLocalStorage()">
+                            <span class="menu-icon">
+                                <img src="img/ex3.svg">
+                            </span>
+                            <span class="menu-txt">
+                                Reset data
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="openManageTagsModal()">
+                            <span class="menu-icon">
+                                <img src="img/ex4.svg"/>
+                            </span>
+                            <span class="menu-txt">
+                                Manage Tags
+                            </span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#" onclick="openIncomeModal()">
+                            <span class="menu-icon">
+                                <img src="img/ex5.svg"/>
+                            </span>
+                            <span class="menu-txt">
+                                Edit Income
+                            </span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            </div>
+            
+            <div class="bhead">
+            <div class="left-content">
+                <a class="hbilllist" href="#">Hide bill list</a>
+            </div>
+            <div class="right-content">
+                <button class="btn btn-outline income-opn">Add income</button>
+                <button class="btn bill-opn">Add a bill</button>
+            </div>
+            </div>  
+
+            <div class="table-container">
+                <table class="table" border="0" id="billsTable">
+                    <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Amount</th>
+                        <th>Frequency</th>
+                        <th>Date</th>
+                        <th>Tag</th>
+                        <th>Yearly Total</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Food</td>
+                            <td><span class="price">-$ 1195.47</span></td>
+                            <td>Fortnightly</td>
+                            <td>27th</td>
+                            <td>Living Expenses</td>
+                            <td><span class="price">-$ 7800.00</span></td>
+                        </tr>
+                        <tr>
+                            <td>Food</td>
+                            <td><span class="price">-$ 1195.47</span></td>
+                            <td>Fortnightly</td>
+                            <td>27th</td>
+                            <td>Living Expenses</td>
+                            <td><span class="price">-$ 7800.00</span></td>
+                        </tr>
+                        <tr>
+                            <td>Food</td>
+                            <td><span class="price">-$ 1195.47</span></td>
+                            <td>Fortnightly</td>
+                            <td>27th</td>
+                            <td>Living Expenses</td>
+                            <td><span class="price">-$ 7800.00</span></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- --->
+            <div class="chart-box">
+                <div class="chart-container">
+                    <canvas id="financialChart"></canvas>
+                </div>
+            </div>
+            <div class="cycle-header">
+                <div class="left-content">
+                    <div class="tab-menu">
+                        <ul>
+                            <li><a data-icon="img/pcycle.svg" data-active="img/mnact.svg" data-target="cycle-body" class="link-act" href="#"><img src="img/pcycle.svg"></a></li>
+                            <li><a data-icon="img/pmnth.svg" data-active="img/mnacc.svg" data-target="month-body" href="#"><img src="img/pmnth.svg"></a></li>
+                        </ul>
+                    </div>
+                </div>
+          
+            </div>
+            <div id="accordionContainer">
+                <div class="cycle-body tab-body">
+                   
+                </div>
+                
+                <div class="month-body tab-body">
+                   
+                    </div>
+                </div>
+        </div>
+     </div>
+    </div>
+
+
+    <div id="oneOffIncomeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeOneOffIncomeModal()">&times;</span>
+            <form id="oneOffIncomeForm">
+                <input type="hidden" id="incomeIndex" name="incomeIndex">
+                <div class="form-group">
+                    <label for="incomeName">Income Name:</label>
+                    <input type="text" id="incomeName" name="incomeName" required>
+                </div>
+                <div class="form-group">
+                    <label for="oneOffIncomeAmount">Income Amount:</label>
+                    <input type="number" step="0.01" id="oneOffIncomeAmount" name="incomeAmount" required> <!-- Corrected ID -->
+                </div>
+                <div class="form-group">
+                    <label for="incomeDate">Date Received:</label>
+                    <input type="date" id="incomeDate" name="incomeDate" required>
+                </div>
+                <div class="modal-footer">
+                    <a class="go-back" href="#"><img src="img/bck.png"/>Go back</a>
+                    <button type="submit" id="submitOneOffIncome" class="primary-btn">Add Income</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+
+    <div id="manageTagsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeManageTagsModal()">&times;</span>
+            <h2>Manage Tags</h2>
+            <div class="form-group">
+                <label for="existingTag">Existing Tag:</label>
+                <select id="existingTag" name="existingTag" onchange="loadTagInfo()">
+                    <!-- Dynamic content will be inserted here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="newTagName">New Tag Name:</label>
+                <input type="text" id="newTagName" name="newTagName">
+            </div>
+            <button class="primary-btn" onclick="renameTag()">Rename Tag</button>
+            <button class="delete-btn" onclick="deleteTag()">Delete Tag</button>
+        </div>
+    </div>
+
+
+    <div id="billModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <form id="billsForm">
+                <input type="hidden" id="billIndex" name="billIndex">
+                <div class="form-group">
+                    <label for="billName">Bill Name:</label>
+                    <input type="text" id="billName" name="billName" required>
+                </div>
+                <div class="form-group">
+                    <label for="billAmount">Bill Amount:</label>
+                    <input type="number" step="0.01" id="billAmount" name="billAmount" required>
+                </div>
+                <div class="form-group">
+                    <label for="billFrequency">Bill Frequency:</label>
+                    <select id="billFrequency" name="billFrequency" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                        <option value="monthly">Monthly</option>
+                        <option value="quarterly">Quarterly</option>
+                        <option value="yearly">Yearly</option>
+                        <option value="one-off">One-off</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="billDate">Next Due Date:</label>
+                    <input type="date" id="billDate" name="billDate" required>
+                </div>
+                <div class="form-group">
+                    <label for="billTag">Tag:</label>
+                    <input type="text" id="billTag" name="billTag" list="tagList">
+                    <datalist id="tagList"></datalist>
+                </div>
+                <div class="modal-footer">
+                    <a class="go-back" href="#"><img src="img/bck.png"/>Go back</a>
+                    <button type="submit" id="submitBill" class="primary-btn">Add a Bill</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="incomeModal" class="modal">
+        <div class="modal-content">
+            <h1>Budgeting Tool</h1>
+            <form id="incomeEditForm">
+                <div class="form-group">
+                    <label for="editFrequency">How often do you get paid?</label>
+                    <select id="editFrequency" name="editFrequency" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editIncome">How much do you get paid in that period?</label>
+                    <input type="number" step="0.01" id="editIncome" name="editIncome" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPayday">When is your next pay day?</label>
+                    <input type="date" id="editPayday" name="editPayday" required>
+                </div>
+                <button type="button" class="primary-btn" onclick="updateIncome()">Next Step</button>
+                <div class="bottom-step">
+                    <input type="file" id="importFile" style="display:none;" onchange="importData(event)">
+                    <a href="#" onclick="document.getElementById('importFile').click()">
+                        <span class="menu-icon">
+                            <img src="img/exp.png"/>
+                        </span>
+                        <span class="menu-txt">
+                            Import data
+                        </span>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+   
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <style>
+        .box {
+            width: 30%;
+            float: left;
+            margin-right: 20px;
+        }
+        .midbox {
+            display: flex;
+        }
+        .midbox .settings-menu {
+            width: 30%;
+        }
+
+        .midbox .box {
+            margin-bottom: 0;
+        }
+    </style>
+    <script>
+        jQuery('.addbill').click(function(){
+            jQuery('#billModal').show();
+            return false;
+        });
+        jQuery('a.go-back').click(function(){
+            jQuery(this).parent().parent().parent().parent().hide();
+            return false;
+        });
+    </script>
+    <script>
+        $('.tab-menu a').click(function(){
+            var ths = $(this);
+            var actv = $(ths).data('active');
+            var trg = $(ths).data('target');
+            $('.tab-menu a').each(function(){
+                $(this).removeClass('link-act');
+                var icn = $(this).data('icon');
+                $(this).find('img').attr('src',icn);
+            });
+            // $('.tab-menu a').removeClass('link-act');
+            $(ths).addClass('link-act');
+            $('.tab-body').hide();
+            $('.'+trg).show();
+            $(ths).find('img').attr('src',actv);
+            var vmode = '';
+            if(trg=='month-body')
+            {
+                vmode = 'monthly';
+            }
+            else
+            {
+                vmode = 'payCycle';
+            }
+            toggleViewMode(vmode);
+            return false;
+        });
+        $('button.btn.bill-opn').click(function(){
+            $('#billModal').show();
+            return false;
+        });
+        $('a.go-back').click(function(){
+            $(this).parent().parent().parent().parent().hide();
+            return false;
+        });
+        $('button.btn.btn-outline.income-opn').click(function(){
+            $('#oneOffIncomeModal').show();
+            return false
+        });
+        $(document).ready(function(){
+            let viewMode = localStorage.getItem('viewMode') || 'payCycle';
+            $('.tab-menu a').each(function(){
+                $(this).removeClass('link-act');
+                var icn = $(this).data('icon');
+                $(this).find('img').attr('src',icn);
+            });
+            if(viewMode=='payCycle')
+            {
+                $('.tab-menu a[data-target="cycle-body"]').trigger('click');
+            }
+            else
+            {
+                $('.tab-menu a[data-target="month-body"]').trigger('click');
+            }
+        });
+        $('a.hbilllist').click(function(){
+            if(jQuery(this).hasClass('bactive'))
+            {
+                jQuery('table#billsTable').show();
+                jQuery(this).removeClass('bactive');
+                jQuery(this).text('Hide bill list');
+            }
+            else
+            {
+                jQuery('table#billsTable').hide();
+                jQuery(this).addClass('bactive');
+                jQuery(this).text('Show bill list');
+            }
+          
+            return false;
+        });
+        if( /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+            location.href = 'mob/index.html';
+        }
+    </script>
+</body>
+</html>

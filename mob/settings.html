@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Budgeting Tool</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,300..800;1,300..800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="style2.css">
+    
+    <!-- Required meta tags for iOS web app -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    
+    <!-- Icons for the web app -->
+    <link rel="apple-touch-icon" href="path/to/your-icon.png">
+    <link rel="apple-touch-icon" sizes="76x76" href="path/to/your-icon.png">
+    <link rel="apple-touch-icon" sizes="120x120" href="path/to/your-icon.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="path/to/your-icon.png">
+  
+</head>
+<body>
+    <div class="container">
+   
+     <div class="main-container">
+        <div class="settings-menu">
+            <ul class="sett">
+                <li>
+                    <a href="#" onclick="exportData()">
+                        <span class="menu-icon">
+                            <img src="img/ex1.svg"/>
+                        </span>
+                        <span class="menu-txt">
+                            Export data
+                        </span>
+                    </a>
+                </li>
+                <input type="file" id="importFile" style="display:none;" onchange="importData(event)">
+                <li>
+                    <a href="#" onclick="document.getElementById('importFile').click()">
+                        <span class="menu-icon">
+                            <img src="img/ex2.svg"/>
+                        </span>
+                        <span class="menu-txt">
+                            Import data
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="resetLocalStorage()">
+                        <span class="menu-icon">
+                            <img src="img/ex3.svg">
+                        </span>
+                        <span class="menu-txt">
+                            Reset data
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="openManageTagsModal()">
+                        <span class="menu-icon">
+                            <img src="img/ex4.svg"/>
+                        </span>
+                        <span class="menu-txt">
+                            Manage Tags
+                        </span>
+                    </a>
+                </li>
+                <li>
+                    <a href="#" onclick="openIncomeModal()">
+                        <span class="menu-icon">
+                            <img src="img/ex5.svg"/>
+                        </span>
+                        <span class="menu-txt">
+                            Edit Income
+                        </span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+     </div>
+    </div>
+    <div id="manageTagsModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeManageTagsModal()">&times;</span>
+            <h2>Manage Tags</h2>
+            <div class="form-group">
+                <label for="existingTag">Existing Tag:</label>
+                <select id="existingTag" name="existingTag" onchange="loadTagInfo()">
+                    <!-- Dynamic content will be inserted here -->
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="newTagName">New Tag Name:</label>
+                <input type="text" id="newTagName" name="newTagName">
+            </div>
+            <div class="modal-footer">
+                <div>
+                <a class="go-back" href="#"><img src="img/bck.png"/>Go back</a>
+            <button class="primary-btn" onclick="renameTag()">Rename Tag</button>
+            <button class="delete-btn" onclick="deleteTag()">Delete Tag</button>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="incomeModal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeIncomeModal()">&times;</span>
+            <form id="incomeEditForm">
+                <div class="form-group">
+                    <label for="editFrequency">How often do you get paid?</label>
+                    <select id="editFrequency" name="editFrequency" required>
+                        <option value="weekly">Weekly</option>
+                        <option value="fortnightly">Fortnightly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="editIncome">How much do you get paid in that period?</label>
+                    <input type="number" step="0.01" id="editIncome" name="editIncome" required>
+                </div>
+                <div class="form-group">
+                    <label for="editPayday">When is your next pay day?</label>
+                    <input type="date" id="editPayday" name="editPayday" required>
+                </div>
+                <div class="modal-footer">
+                    <a class="go-back" href="#"><img src="img/bck.png"/>Go back</a>
+                    <button type="button" class="primary-btn" onclick="updateIncome()">Add income</button>
+                </div>
+                
+            </form>
+        </div>
+    </div>
+
+    <div class="bottom-menu-bar">
+        <div class="bottom-menu-inner">
+            <ul class="menucs">
+                <li><a href="index.html">
+                    <span class="menu-img">
+                        <svg width="17" height="18" viewBox="0 0 17 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M2.40625 16H5.40625V10H11.4062V16H14.4062V7L8.40625 2.5L2.40625 7V16ZM0.40625 18V6L8.40625 0L16.4062 6V18H9.40625V12H7.40625V18H0.40625Z" fill="white"/>
+                        </svg>
+                    </span>
+                    <span class="menu-txt">Home</span>
+                </a></li>
+                <li><a href="pay-cycle.html">
+                    <span class="menu-img">
+                        <svg width="11" height="21" viewBox="0 0 11 21" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M4.35294 21V18.4917C3.31373 18.2583 2.41667 17.8111 1.66176 17.15C0.906863 16.4889 0.352941 15.5556 0 14.35L2.17647 13.475C2.47059 14.4083 2.90686 15.1181 3.48529 15.6042C4.06373 16.0903 4.82353 16.3333 5.76471 16.3333C6.56863 16.3333 7.25 16.1535 7.80882 15.7937C8.36765 15.434 8.64706 14.875 8.64706 14.1167C8.64706 13.4361 8.43137 12.8965 8 12.4979C7.56863 12.0993 6.56863 11.6472 5 11.1417C3.31373 10.6167 2.15686 9.98958 1.52941 9.26042C0.901961 8.53125 0.588235 7.64167 0.588235 6.59167C0.588235 5.32778 1 4.34583 1.82353 3.64583C2.64706 2.94583 3.4902 2.54722 4.35294 2.45V0H6.70588V2.45C7.68627 2.60556 8.4951 2.96042 9.13235 3.51458C9.76961 4.06875 10.2353 4.74444 10.5294 5.54167L8.35294 6.475C8.11765 5.85278 7.78431 5.38611 7.35294 5.075C6.92157 4.76389 6.33333 4.60833 5.58824 4.60833C4.72549 4.60833 4.06863 4.79792 3.61765 5.17708C3.16667 5.55625 2.94118 6.02778 2.94118 6.59167C2.94118 7.23333 3.23529 7.73889 3.82353 8.10833C4.41176 8.47778 5.43137 8.86667 6.88235 9.275C8.23529 9.66389 9.2598 10.2812 9.95588 11.1271C10.652 11.9729 11 12.95 11 14.0583C11 15.4389 10.5882 16.4889 9.76471 17.2083C8.94118 17.9278 7.92157 18.375 6.70588 18.55V21H4.35294Z" fill="white"/>
+                        </svg>
+                    </span>
+                    <span class="menu-txt">Pay Cycle</span> 
+                </a></li>
+                <li><a href="bills.html">
+                    <span class="menu-img">
+                        <svg width="19" height="20" viewBox="0 0 19 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M3.59375 20C2.76042 20 2.05208 19.7083 1.46875 19.125C0.885417 18.5417 0.59375 17.8333 0.59375 17V14H3.59375V0L5.09375 1.5L6.59375 0L8.09375 1.5L9.59375 0L11.0938 1.5L12.5938 0L14.0938 1.5L15.5938 0L17.0938 1.5L18.5938 0V17C18.5938 17.8333 18.3021 18.5417 17.7188 19.125C17.1354 19.7083 16.4271 20 15.5938 20H3.59375ZM15.5938 18C15.8771 18 16.1146 17.9042 16.3063 17.7125C16.4979 17.5208 16.5938 17.2833 16.5938 17V3H5.59375V14H14.5938V17C14.5938 17.2833 14.6896 17.5208 14.8813 17.7125C15.0729 17.9042 15.3104 18 15.5938 18ZM6.59375 7V5H12.5938V7H6.59375ZM6.59375 10V8H12.5938V10H6.59375ZM14.5938 7C14.3104 7 14.0729 6.90417 13.8813 6.7125C13.6896 6.52083 13.5938 6.28333 13.5938 6C13.5938 5.71667 13.6896 5.47917 13.8813 5.2875C14.0729 5.09583 14.3104 5 14.5938 5C14.8771 5 15.1146 5.09583 15.3063 5.2875C15.4979 5.47917 15.5938 5.71667 15.5938 6C15.5938 6.28333 15.4979 6.52083 15.3063 6.7125C15.1146 6.90417 14.8771 7 14.5938 7ZM14.5938 10C14.3104 10 14.0729 9.90417 13.8813 9.7125C13.6896 9.52083 13.5938 9.28333 13.5938 9C13.5938 8.71667 13.6896 8.47917 13.8813 8.2875C14.0729 8.09583 14.3104 8 14.5938 8C14.8771 8 15.1146 8.09583 15.3063 8.2875C15.4979 8.47917 15.5938 8.71667 15.5938 9C15.5938 9.28333 15.4979 9.52083 15.3063 9.7125C15.1146 9.90417 14.8771 10 14.5938 10ZM3.59375 18H12.5938V16H2.59375V17C2.59375 17.2833 2.68958 17.5208 2.88125 17.7125C3.07292 17.9042 3.31042 18 3.59375 18Z" fill="white"/>
+                            </svg>
+                    </span>
+                    <span class="menu-txt">Bills list</span>
+                </a></li>
+                <li><a href="settings.html" class="menu-act">
+                    <span class="menu-img">
+                        <svg width="21" height="20" viewBox="0 0 21 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M7.9377 20L7.5377 16.8C7.32103 16.7167 7.11686 16.6167 6.9252 16.5C6.73353 16.3833 6.54603 16.2583 6.3627 16.125L3.3877 17.375L0.637695 12.625L3.2127 10.675C3.19603 10.5583 3.1877 10.4458 3.1877 10.3375V9.6625C3.1877 9.55417 3.19603 9.44167 3.2127 9.325L0.637695 7.375L3.3877 2.625L6.3627 3.875C6.54603 3.74167 6.7377 3.61667 6.9377 3.5C7.1377 3.38333 7.3377 3.28333 7.5377 3.2L7.9377 0H13.4377L13.8377 3.2C14.0544 3.28333 14.2585 3.38333 14.4502 3.5C14.6419 3.61667 14.8294 3.74167 15.0127 3.875L17.9877 2.625L20.7377 7.375L18.1627 9.325C18.1794 9.44167 18.1877 9.55417 18.1877 9.6625V10.3375C18.1877 10.4458 18.171 10.5583 18.1377 10.675L20.7127 12.625L17.9627 17.375L15.0127 16.125C14.8294 16.2583 14.6377 16.3833 14.4377 16.5C14.2377 16.6167 14.0377 16.7167 13.8377 16.8L13.4377 20H7.9377ZM9.6877 18H11.6627L12.0127 15.35C12.5294 15.2167 13.0085 15.0208 13.4502 14.7625C13.8919 14.5042 14.296 14.1917 14.6627 13.825L17.1377 14.85L18.1127 13.15L15.9627 11.525C16.046 11.2917 16.1044 11.0458 16.1377 10.7875C16.171 10.5292 16.1877 10.2667 16.1877 10C16.1877 9.73333 16.171 9.47083 16.1377 9.2125C16.1044 8.95417 16.046 8.70833 15.9627 8.475L18.1127 6.85L17.1377 5.15L14.6627 6.2C14.296 5.81667 13.8919 5.49583 13.4502 5.2375C13.0085 4.97917 12.5294 4.78333 12.0127 4.65L11.6877 2H9.7127L9.3627 4.65C8.84603 4.78333 8.36686 4.97917 7.9252 5.2375C7.48353 5.49583 7.07936 5.80833 6.7127 6.175L4.2377 5.15L3.2627 6.85L5.4127 8.45C5.32936 8.7 5.27103 8.95 5.2377 9.2C5.20436 9.45 5.1877 9.71667 5.1877 10C5.1877 10.2667 5.20436 10.525 5.2377 10.775C5.27103 11.025 5.32936 11.275 5.4127 11.525L3.2627 13.15L4.2377 14.85L6.7127 13.8C7.07936 14.1833 7.48353 14.5042 7.9252 14.7625C8.36686 15.0208 8.84603 15.2167 9.3627 15.35L9.6877 18ZM10.7377 13.5C11.7044 13.5 12.5294 13.1583 13.2127 12.475C13.896 11.7917 14.2377 10.9667 14.2377 10C14.2377 9.03333 13.896 8.20833 13.2127 7.525C12.5294 6.84167 11.7044 6.5 10.7377 6.5C9.75436 6.5 8.9252 6.84167 8.2502 7.525C7.5752 8.20833 7.2377 9.03333 7.2377 10C7.2377 10.9667 7.5752 11.7917 8.2502 12.475C8.9252 13.1583 9.75436 13.5 10.7377 13.5Z" fill="white"/>
+                            </svg>
+                    </span>
+                    <span class="menu-txt">Settings</span>
+                </a></li>
+            </ul>
+        </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js" integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="script.js"></script>
+    <script>
+        $('a.go-back').click(function(){
+            $(this).parent().parent().parent().parent().hide();
+            return false;
+        });
+        if(! /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) ) {
+            location.href = '../index.html';
+        }
+    </script>
+</body>
+</html>
