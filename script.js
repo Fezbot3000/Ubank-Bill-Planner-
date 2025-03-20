@@ -395,9 +395,6 @@ function saveBill() {
         // Reset form
         document.getElementById('add-bill-form').reset();
         
-        // Show success message
-        alert('Bill added successfully');
-        
         // Log final state
         console.log("Final monthly projections:", {...monthlyProjections});
         console.log("Bills data:", [...billsData]);
