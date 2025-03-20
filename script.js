@@ -125,6 +125,7 @@ function setupEventListeners() {
             // Update display
             updateMonthDisplay();
             updateBillsDisplay();
+            updateChart(); // Also update chart for active month
         };
     });
     
@@ -149,11 +150,23 @@ function initChart() {
         datasets: [{
             label: 'Projected Bills',
             data: [0.00, 0.00, 0.00, 0.00],
-            backgroundColor: 'rgba(98, 0, 238, 0.2)',
-            borderColor: 'rgba(98, 0, 238, 1)',
-            borderWidth: 2,
-            tension: 0.4,
-            fill: true
+            backgroundColor: function(context) {
+                const index = context.dataIndex;
+                const label = context.chart.data.labels[index];
+                
+                // Highlight active month
+                return label === currentState.month ? 'rgba(98, 0, 238, 0.6)' : 'rgba(226, 232, 240, 0.6)';
+            },
+            borderColor: function(context) {
+                const index = context.dataIndex;
+                const label = context.chart.data.labels[index];
+                
+                return label === currentState.month ? 'rgba(98, 0, 238, 1)' : 'rgba(226, 232, 240, 1)';
+            },
+            borderWidth: 1,
+            barPercentage: 0.8,
+            categoryPercentage: 0.8,
+            borderRadius: 4
         }]
     };
     
@@ -175,6 +188,10 @@ function initChart() {
         scales: {
             y: {
                 beginAtZero: true,
+                grid: {
+                    display: true,
+                    color: 'rgba(0, 0, 0, 0.05)'
+                },
                 ticks: {
                     callback: function(value) {
                         return '$' + value;
@@ -190,7 +207,7 @@ function initChart() {
     };
     
     billChart = new Chart(ctx, {
-        type: 'line',
+        type: 'bar', // Changed to bar chart
         data: chartData,
         options: chartOptions
     });
@@ -204,6 +221,23 @@ function updateChart() {
         monthlyProjections['May'],
         monthlyProjections['Jun']
     ];
+    
+    // Update backgroundColor callback to highlight active month
+    billChart.data.datasets[0].backgroundColor = function(context) {
+        const index = context.dataIndex;
+        const label = context.chart.data.labels[index];
+        
+        // Highlight active month
+        return label === currentState.month ? 'rgba(98, 0, 238, 0.6)' : 'rgba(226, 232, 240, 0.6)';
+    };
+    
+    billChart.data.datasets[0].borderColor = function(context) {
+        const index = context.dataIndex;
+        const label = context.chart.data.labels[index];
+        
+        return label === currentState.month ? 'rgba(98, 0, 238, 1)' : 'rgba(226, 232, 240, 1)';
+    };
+    
     billChart.update();
 }
 
@@ -310,6 +344,9 @@ function navigateMonth(direction) {
     // Update current state
     currentState.month = indexToMonth[monthIndex];
     currentState.year = year;
+    
+    // Update chart to highlight the active month
+    updateChart();
     
     // Update display
     updateMonthDisplay();
@@ -421,7 +458,7 @@ function getIconForBill(name) {
 function getIconHTML(bill) {
     switch(bill.icon) {
         case 'netflix':
-            return '<i class="fas fa-film"></i>';
+            return '<i class="fab fa-netflix"></i>';
         case 'spotify':
             return '<i class="fab fa-spotify"></i>';
         case 'optus':
