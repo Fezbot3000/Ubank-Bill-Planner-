@@ -1,41 +1,42 @@
 // Global variables
 let billsData = [];
-let monthlyProjections = {
-    'Mar': 0.00,
-    'Apr': 0.00,
-    'May': 0.00,
-    'Jun': 0.00
-};
+let monthlyProjections = {}; // Will be populated dynamically
 let currentState = {
-    month: 'Mar',
-    year: 2025,
-    view: 'monthly'
+    month: '', // Will be set to current month
+    year: new Date().getFullYear(),
+    view: 'monthly' // 'monthly', 'yearly'
 };
 let billChart;
+let visibleMonths = []; // Array to store visible months in the current view
+let displayedMonths = []; // Array to store 4 currently displayed months
 
 // Initialize when document is ready
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Document loaded");
     
-    // Load saved data
+    // Set current month
+    const currentDate = new Date();
+    const monthAbbr = getMonthAbbreviation(currentDate.getMonth());
+    currentState.month = monthAbbr;
+    currentState.year = currentDate.getFullYear();
+    
+    // Initialize the visible months based on current view
+    updateVisibleDateRange();
+    
+    // Initialize empty projections for each visible month
+    initializeProjections();
+    
+    // Load saved data (this will update projections based on saved bills)
     loadDataFromStorage();
     
     // Initialize Materialize components
-    var elems = document.querySelectorAll('.modal');
-    var instances = M.Modal.init(elems, {
-        dismissible: true,
-        opacity: 0.5,
-        inDuration: 300,
-        outDuration: 200
-    });
+    initializeMaterializeComponents();
     
-    // Initialize dropdowns
-    var dropdownElems = document.querySelectorAll('.dropdown-trigger');
-    M.Dropdown.init(dropdownElems);
+    // Set initial displayed months
+    updateDisplayedMonths();
     
-    // Initialize selects
-    var selectElems = document.querySelectorAll('select');
-    M.FormSelect.init(selectElems);
+    // Create month tabs dynamically
+    createMonthTabs();
     
     // Initialize chart
     initChart();
@@ -52,7 +53,197 @@ document.addEventListener('DOMContentLoaded', function() {
     // Update displays
     updateMonthDisplay();
     updateBillsDisplay();
+    
+    console.log("Initialization complete with projections:", monthlyProjections);
 });
+
+// Helper function to get month abbreviation
+function getMonthAbbreviation(monthIndex) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months[monthIndex];
+}
+
+// Helper function to get month index from abbreviation
+function getMonthIndex(monthAbbr) {
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    return months.indexOf(monthAbbr);
+}
+
+// Update the active month tab
+function updateActiveMonthTab() {
+    document.querySelectorAll('.month-tab').forEach(tab => {
+        const tabMonth = tab.getAttribute('data-month');
+        const tabYear = parseInt(tab.getAttribute('data-year'));
+        
+        if (tabMonth === currentState.month && tabYear === currentState.year) {
+            tab.classList.add('active');
+        } else {
+            tab.classList.remove('active');
+        }
+    });
+}
+
+// Enhanced bill filtering function
+function filterBillsByYearAndMonth(bills, year, month = null) {
+    return bills.filter(bill => {
+        const billYear = bill.dueDate.getFullYear();
+        
+        // If year doesn't match, immediately return false
+        if (billYear !== year) {
+            return false;
+        }
+        
+        // If no specific month is provided, return all bills for the year
+        if (month === null) {
+            return true;
+        }
+        
+        // Convert month to index if it's a string abbreviation
+        const monthIndex = typeof month === 'string' 
+            ? getMonthIndex(month) 
+            : month;
+        
+        return bill.dueDate.getMonth() === monthIndex;
+    });
+}
+
+// Fix for updating visible date range to show more years
+function updateVisibleDateRange() {
+    visibleMonths = [];
+    
+    const currentDate = new Date();
+    const currentMonth = currentDate.getMonth();
+    const currentYear = currentDate.getFullYear();
+    
+    if (currentState.view === 'monthly' || currentState.view === 'weekly') {
+        // Show 12 months into the future
+        for (let i = 0; i < 12; i++) {
+            let targetMonth = (currentMonth + i) % 12;
+            let targetYear = currentYear + Math.floor((currentMonth + i) / 12);
+            
+            visibleMonths.push({
+                month: getMonthAbbreviation(targetMonth),
+                year: targetYear,
+                // Create a unique key for this month/year combination
+                key: `${getMonthAbbreviation(targetMonth)}-${targetYear}`
+            });
+        }
+    } else if (currentState.view === 'yearly') {
+        // Show 10 years (current year + 9 years) instead of just 6
+        for (let i = 0; i < 10; i++) {
+            visibleMonths.push({
+                month: 'Jan', // Just use January as a marker for the year
+                year: currentYear + i,
+                key: `Jan-${currentYear + i}`
+            });
+        }
+    }
+    
+    // Set the current month to the first in the range if it's not in the range
+    if (!visibleMonths.find(m => m.month === currentState.month && m.year === currentState.year)) {
+        currentState.month = visibleMonths[0].month;
+        currentState.year = visibleMonths[0].year;
+    }
+    
+    console.log("Visible months/years:", visibleMonths);
+}
+
+// Fix updateDisplayedMonths to always show 4 consecutive months/years
+function updateDisplayedMonths() {
+    if (currentState.view === 'yearly') {
+        // For yearly view, show 4 consecutive years, starting with the current year
+        const currentYearKey = `Jan-${currentState.year}`;
+        let startIndex = visibleMonths.findIndex(m => m.key === currentYearKey);
+        
+        if (startIndex === -1) {
+            // If current year not found, start from the beginning
+            startIndex = 0;
+        }
+        
+        // Ensure we don't go past the end of visible months
+        if (startIndex > visibleMonths.length - 4) {
+            startIndex = Math.max(0, visibleMonths.length - 4);
+        }
+        
+        displayedMonths = visibleMonths.slice(startIndex, startIndex + 4);
+    } else {
+        // Existing month navigation logic
+        const currentMonthKey = `${currentState.month}-${currentState.year}`;
+        const currentIndex = visibleMonths.findIndex(m => m.key === currentMonthKey);
+        
+        if (currentIndex === -1) {
+            console.error("Current month not found in visible months");
+            return;
+        }
+        
+        let startIndex = currentIndex;
+        if (startIndex > visibleMonths.length - 4) {
+            startIndex = Math.max(0, visibleMonths.length - 4);
+        }
+        
+        displayedMonths = visibleMonths.slice(startIndex, startIndex + 4);
+    }
+    
+    console.log("Displayed months/years:", displayedMonths);
+}
+
+// Initialize Materialize components
+function initializeMaterializeComponents() {
+    var elems = document.querySelectorAll('.modal');
+    var modalInstances = M.Modal.init(elems, {
+        dismissible: true,
+        opacity: 0.5,
+        inDuration: 300,
+        outDuration: 200
+    });
+    
+    var dropdownElems = document.querySelectorAll('.dropdown-trigger');
+    M.Dropdown.init(dropdownElems);
+    
+    var selectElems = document.querySelectorAll('select');
+    M.FormSelect.init(selectElems);
+}
+
+
+// Initialize projections for each visible month
+function initializeProjections() {
+    monthlyProjections = {};
+    
+    visibleMonths.forEach(monthData => {
+        monthlyProjections[monthData.key] = 0.00;
+    });
+    
+    console.log("Initialized projections:", monthlyProjections);
+}
+
+// Modify createMonthTabs to include the year in yearly view
+function createMonthTabs() {
+    const tabsContainer = document.querySelector('.month-tabs');
+    tabsContainer.innerHTML = ''; // Clear existing tabs
+    
+    displayedMonths.forEach((monthData, index) => {
+        const isActive = (monthData.month === currentState.month && monthData.year === currentState.year);
+        
+        const tab = document.createElement('div');
+        tab.className = `month-tab ${isActive ? 'active' : ''}`;
+        tab.setAttribute('data-month', monthData.month);
+        tab.setAttribute('data-year', monthData.year);
+        tab.setAttribute('data-key', monthData.key);
+        
+        // For yearly view, show the year instead of just the month
+        let labelText = monthData.month;
+        if (currentState.view === 'yearly') {
+            labelText = monthData.year.toString();
+        }
+        
+        tab.innerHTML = `
+            <div class="amount" id="${monthData.key.toLowerCase()}-amount">$0.00</div>
+            <div class="month">${labelText}</div>
+        `;
+        
+        tabsContainer.appendChild(tab);
+    });
+}
 
 // Direct modal open function
 function openModal() {
@@ -73,7 +264,7 @@ function openModal() {
     }
 }
 
-// Setup event listeners
+// Fix setupEventListeners to use the new handleViewChange function
 function setupEventListeners() {
     // Add bill buttons
     document.getElementById('add-bill-button').onclick = function() {
@@ -98,8 +289,6 @@ function setupEventListeners() {
             if (instance) {
                 instance.open();
             }
-        } else {
-            console.error("Settings dropdown not found");
         }
     };
     
@@ -108,26 +297,19 @@ function setupEventListeners() {
         resetAllData();
     };
     
-    // Month tabs
-    document.querySelectorAll('.month-tab').forEach(tab => {
-        tab.onclick = function() {
-            // Remove active class from all tabs
-            document.querySelectorAll('.month-tab').forEach(t => {
-                t.classList.remove('active');
-            });
+    // View type selection
+    document.querySelectorAll('#month-dropdown a').forEach(item => {
+        item.addEventListener('click', function(e) {
+            e.preventDefault();
+            const viewType = this.textContent.toLowerCase();
             
-            // Add active class to clicked tab
-            this.classList.add('active');
-            
-            // Update current month
-            currentState.month = this.getAttribute('data-month');
-            
-            // Update display
-            updateMonthDisplay();
-            updateBillsDisplay();
-            updateChart(); // Also update chart for active month
-        };
+            // Use the new handleViewChange function
+            handleViewChange(viewType);
+        });
     });
+    
+    // Setup month tab listeners
+    setupMonthTabListeners();
     
     // Month navigation
     document.querySelector('.prev-month').onclick = function(e) {
@@ -141,27 +323,73 @@ function setupEventListeners() {
     };
 }
 
-// Initialize the chart
+// Setup month tab listeners
+function setupMonthTabListeners() {
+    document.querySelectorAll('.month-tab').forEach(tab => {
+        tab.onclick = function() {
+            // Remove active class from all tabs
+            document.querySelectorAll('.month-tab').forEach(t => {
+                t.classList.remove('active');
+            });
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            // Update current month and year
+            currentState.month = this.getAttribute('data-month');
+            currentState.year = parseInt(this.getAttribute('data-year'));
+            
+            // Update display
+            updateMonthDisplay();
+            updateBillsDisplay();
+            updateChart(); // Also update chart for active month
+        };
+    });
+}
+
+// Fix initChart to handle yearly view correctly
 function initChart() {
+    console.group('Initializing Chart');
+    
     const ctx = document.getElementById('billChart').getContext('2d');
     
+    // Ensure projections are calculated
+    recalculateYearlyProjections();
+    
+    // Get labels and data for displayed months
+    const labels = displayedMonths.map(m => m.month);
+    const data = displayedMonths.map(m => monthlyProjections[m.key] || 0);
+    
+    console.log('Chart labels:', labels);
+    console.log('Chart data:', data);
+    
+    // Set min/max for Y-axis
+    const maxValue = Math.max(...data, 100); // Minimum height of 100
+    
     const chartData = {
-        labels: ['Mar', 'Apr', 'May', 'Jun'],
+        labels: labels,
         datasets: [{
-            label: 'Projected Bills',
-            data: [0.00, 0.00, 0.00, 0.00],
+            label: currentState.view === 'yearly' ? 'Yearly Projected Bills' : 'Projected Bills',
+            data: data,
             backgroundColor: function(context) {
                 const index = context.dataIndex;
-                const label = context.chart.data.labels[index];
+                if (index >= displayedMonths.length) return 'rgba(226, 232, 240, 0.6)';
                 
-                // Highlight active month
-                return label === currentState.month ? 'rgba(98, 0, 238, 0.6)' : 'rgba(226, 232, 240, 0.6)';
+                const month = displayedMonths[index].month;
+                const year = displayedMonths[index].year;
+                
+                return (month === currentState.month && year === currentState.year) ? 
+                    'rgba(98, 0, 238, 0.6)' : 'rgba(226, 232, 240, 0.6)';
             },
             borderColor: function(context) {
                 const index = context.dataIndex;
-                const label = context.chart.data.labels[index];
+                if (index >= displayedMonths.length) return 'rgba(226, 232, 240, 1)';
                 
-                return label === currentState.month ? 'rgba(98, 0, 238, 1)' : 'rgba(226, 232, 240, 1)';
+                const month = displayedMonths[index].month;
+                const year = displayedMonths[index].year;
+                
+                return (month === currentState.month && year === currentState.year) ? 
+                    'rgba(98, 0, 238, 1)' : 'rgba(226, 232, 240, 1)';
             },
             borderWidth: 1,
             barPercentage: 0.8,
@@ -188,6 +416,7 @@ function initChart() {
         scales: {
             y: {
                 beginAtZero: true,
+                suggestedMax: maxValue * 1.2, // Add padding
                 grid: {
                     display: true,
                     color: 'rgba(0, 0, 0, 0.05)'
@@ -206,221 +435,405 @@ function initChart() {
         }
     };
     
+    // Destroy previous chart if it exists
+    if (billChart) {
+        billChart.destroy();
+    }
+    
+    // Create new chart
     billChart = new Chart(ctx, {
-        type: 'bar', // Changed to bar chart
+        type: 'bar',
         data: chartData,
         options: chartOptions
     });
+    
+    console.log('Chart initialized');
+    console.groupEnd();
 }
 
-// Update the chart with new data
+// Fix updateChart to display the correct data
 function updateChart() {
-    billChart.data.datasets[0].data = [
-        monthlyProjections['Mar'],
-        monthlyProjections['Apr'],
-        monthlyProjections['May'],
-        monthlyProjections['Jun']
-    ];
+    console.group('Updating Chart');
     
-    // Update backgroundColor callback to highlight active month
+    if (!billChart) {
+        initChart();
+        return;
+    }
+    
+    // Ensure projections are up to date
+    recalculateYearlyProjections();
+    
+    // Get data for displayed months
+    const data = displayedMonths.map(m => {
+        return monthlyProjections[m.key] || 0;
+    });
+    
+    console.log('Chart data:', data);
+    
+    // Set min/max for Y-axis based on data
+    const maxValue = Math.max(...data, 100); // Ensure minimum height
+    
+    // Update Y-axis scale
+    billChart.options.scales.y.suggestedMax = maxValue * 1.2;
+    
+    // Update chart data
+    billChart.data.datasets[0].data = data;
+    billChart.data.labels = displayedMonths.map(m => m.month);
+    
+    // Update colors to highlight active month/year
     billChart.data.datasets[0].backgroundColor = function(context) {
         const index = context.dataIndex;
-        const label = context.chart.data.labels[index];
+        if (index >= displayedMonths.length) return 'rgba(226, 232, 240, 0.6)';
         
-        // Highlight active month
-        return label === currentState.month ? 'rgba(98, 0, 238, 0.6)' : 'rgba(226, 232, 240, 0.6)';
+        const month = displayedMonths[index].month;
+        const year = displayedMonths[index].year;
+        
+        return (month === currentState.month && year === currentState.year) ? 
+            'rgba(98, 0, 238, 0.6)' : 'rgba(226, 232, 240, 0.6)';
     };
     
     billChart.data.datasets[0].borderColor = function(context) {
         const index = context.dataIndex;
-        const label = context.chart.data.labels[index];
+        if (index >= displayedMonths.length) return 'rgba(226, 232, 240, 1)';
         
-        return label === currentState.month ? 'rgba(98, 0, 238, 1)' : 'rgba(226, 232, 240, 1)';
+        const month = displayedMonths[index].month;
+        const year = displayedMonths[index].year;
+        
+        return (month === currentState.month && year === currentState.year) ? 
+            'rgba(98, 0, 238, 1)' : 'rgba(226, 232, 240, 1)';
     };
     
+    // Update the chart
     billChart.update();
+    
+    console.groupEnd();
 }
 
-// Update month display based on current state
+// Fix updateMonthDisplay to show year in yearly view
 function updateMonthDisplay() {
     const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 
                        'July', 'August', 'September', 'October', 'November', 'December'];
     
-    // Map short month names to month indices
-    const monthMap = {
-        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-    };
+    let displayText;
     
-    // Update month display
-    const monthIndex = monthMap[currentState.month];
-    document.getElementById('current-month').textContent = `${monthNames[monthIndex]} ${currentState.year}`;
+    if (currentState.view === 'yearly') {
+        // For yearly view, just show the year
+        displayText = `${currentState.year}`;
+    } else {
+        // For monthly/weekly view, show month and year
+        const monthIndex = getMonthIndex(currentState.month);
+        displayText = `${monthNames[monthIndex]} ${currentState.year}`;
+    }
+    
+    // Update display
+    document.getElementById('current-month').textContent = displayText;
+    
+    // Find the current month/year key
+    const currentKey = `${currentState.month}-${currentState.year}`;
     
     // Update estimated amount
-    document.getElementById('estimated-amount').textContent = `$${monthlyProjections[currentState.month].toFixed(2)}`;
+    const estimatedAmount = monthlyProjections[currentKey] || 0;
+    document.getElementById('estimated-amount').textContent = 
+        `$${estimatedAmount.toFixed(2)}`;
 }
 
-// Update bills display based on current state
+// Enhanced updateBillsDisplay function to show recurring bills in yearly view with proper labels
 function updateBillsDisplay() {
-    // Map short month names to month indices
-    const monthMap = {
-        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-    };
+    console.group('Updating Bills Display');
+    console.log('Current state:', currentState);
     
-    const currentMonthIndex = monthMap[currentState.month];
+    // Filter bills based on the current view and selected month/year
+    let filteredBills = [];
+    let totalAmount = 0;
     
-    // For monthly bills, we need to show them in every month
-    // Filter bills for the current month view
-    const currentMonthBills = billsData.filter(bill => {
-        if (bill.frequency === 'monthly') {
-            // Monthly bills show up every month
-            return true;
-        } else if (bill.frequency === 'weekly') {
-            // Weekly bills show up every month
-            return true;
-        } else if (bill.frequency === 'yearly' && bill.dueDate.getMonth() === currentMonthIndex) {
-            // Yearly bills only show up in their month
-            return true;
-        } else if (bill.frequency === 'one-time') {
-            // One-time bills only show up in their specific month
-            return bill.dueDate.getMonth() === currentMonthIndex && 
-                  bill.dueDate.getFullYear() === currentState.year;
-        }
+    if (currentState.view === 'yearly') {
+        // For yearly view, get all bills that apply to the selected year
+        const baseYearBills = billsData.filter(bill => {
+            const billYear = bill.dueDate.getFullYear();
+            
+            // For one-time bills, only show if it's in the current year
+            if (bill.frequency === 'one-time') {
+                return billYear === currentState.year;
+            }
+            
+            // For recurring bills (monthly, weekly, yearly), show if they started on or before the current year
+            return billYear <= currentState.year;
+        });
         
-        // Default case - check exact month match
-        return bill.dueDate.getMonth() === currentMonthIndex && 
-               bill.dueDate.getFullYear() === currentState.year;
-    });
+        // For yearly view, we need to expand recurring bills to show their full yearly impact
+        filteredBills = [];
+        baseYearBills.forEach(bill => {
+            // Add the original bill
+            filteredBills.push({...bill});
+            
+            // For monthly and weekly bills, add an indicator that they're recurring
+            if (bill.frequency === 'monthly') {
+                filteredBills[filteredBills.length - 1].displayName = `${bill.name} (Monthly - 12× per year)`;
+                totalAmount += (bill.amount * 12);
+            } else if (bill.frequency === 'weekly') {
+                filteredBills[filteredBills.length - 1].displayName = `${bill.name} (Weekly - 52× per year)`;
+                totalAmount += (bill.amount * 52);
+            } else {
+                // One-time and yearly bills
+                totalAmount += bill.amount;
+            }
+        });
+    } else {
+        // For monthly view, get bills for the current month/year
+        const currentMonthIndex = getMonthIndex(currentState.month);
+        
+        // Filter bills based on frequency and date
+        filteredBills = billsData.filter(bill => {
+            const billMonth = bill.dueDate.getMonth();
+            const billYear = bill.dueDate.getFullYear();
+            
+            if (bill.frequency === 'monthly') {
+                // Show monthly bills for all months after their start date
+                return (billYear < currentState.year) || 
+                       (billYear === currentState.year && billMonth <= currentMonthIndex);
+            } else if (bill.frequency === 'weekly') {
+                // Show weekly bills for all months after their start date
+                return (billYear < currentState.year) || 
+                       (billYear === currentState.year && billMonth <= currentMonthIndex);
+            } else if (bill.frequency === 'yearly') {
+                // Show yearly bills that fall in this month (any year on or after start)
+                return billMonth === currentMonthIndex && billYear <= currentState.year;
+            } else if (bill.frequency === 'one-time') {
+                // Show one-time bills only for the exact month and year
+                return billMonth === currentMonthIndex && billYear === currentState.year;
+            }
+            
+            return false;
+        });
+        
+        // Calculate the total amount for the month
+        filteredBills.forEach(bill => {
+            if (bill.frequency === 'weekly') {
+                totalAmount += (bill.amount * 4); // Weekly bills occur 4 times per month
+                bill.displayName = `${bill.name} (Weekly - 4× per month)`;
+            } else if (bill.frequency === 'monthly') {
+                totalAmount += bill.amount;
+                bill.displayName = `${bill.name} (Monthly)`;
+            } else if (bill.frequency === 'yearly') {
+                totalAmount += bill.amount;
+                bill.displayName = `${bill.name} (Yearly)`;
+            } else {
+                // One-time bills
+                totalAmount += bill.amount;
+            }
+        });
+    }
     
-    console.log("Bills for current month:", currentMonthBills);
+    console.log('Filtered bills:', filteredBills);
+    console.log('Total amount:', totalAmount);
     
-    // Check if there are any bills for the current month
-    if (currentMonthBills.length > 0) {
+    // Update the UI with the filtered bills and total amount
+    if (filteredBills.length > 0) {
         document.getElementById('bills-content').style.display = 'block';
         document.getElementById('empty-state').style.display = 'none';
         
-        // Update upcoming count
-        document.getElementById('upcoming-count').textContent = `${currentMonthBills.length} coming up`;
+        // Update the number of upcoming bills
+        document.getElementById('upcoming-count').textContent = `${filteredBills.length} coming up`;
         
-        // Render the bills
-        renderBillsList(currentMonthBills);
+        // Update the estimated amount to pay
+        document.getElementById('estimated-amount').textContent = `$${totalAmount.toFixed(2)}`;
+        
+        // Render the bills list with display names
+        renderBillsList(filteredBills);
     } else {
         document.getElementById('bills-content').style.display = 'none';
         document.getElementById('empty-state').style.display = 'block';
     }
+    
+    console.groupEnd();
 }
 
-// Navigate month forward or backward
-function navigateMonth(direction) {
-    // Map short month names to month indices
-    const monthMap = {
-        'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-        'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-    };
-    
-    // Map month indices to short month names
-    const indexToMonth = Object.keys(monthMap).reduce((acc, month) => {
-        acc[monthMap[month]] = month;
-        return acc;
-    }, {});
-    
-    // Get current month index
-    let monthIndex = monthMap[currentState.month];
-    let year = currentState.year;
-    
-    // Update month index
-    monthIndex += direction;
-    
-    // Handle year change
-    if (monthIndex < 0) {
-        monthIndex = 11;
-        year--;
-    } else if (monthIndex > 11) {
-        monthIndex = 0;
-        year++;
+// Add debug logger to help with troubleshooting
+function debugLog(message, data) {
+    // Force log to console even if console is not visible
+    if (typeof message === 'string') {
+        setTimeout(console.log.bind(console, '%c' + message, 'color: blue; font-weight: bold;'), 0);
+    } else {
+        setTimeout(console.log.bind(console, message), 0);
     }
     
-    // Update current state
-    currentState.month = indexToMonth[monthIndex];
-    currentState.year = year;
-    
-    // Update chart to highlight the active month
-    updateChart();
-    
-    // Update display
-    updateMonthDisplay();
-    updateBillsDisplay();
-    
-    // Update active tab
-    document.querySelectorAll('.month-tab').forEach(tab => {
-        if (tab.getAttribute('data-month') === currentState.month) {
-            tab.classList.add('active');
-        } else {
-            tab.classList.remove('active');
-        }
-    });
+    if (data !== undefined) {
+        setTimeout(console.log.bind(console, data), 0);
+    }
 }
 
-// Save new bill
-function saveBill() {
-    console.log("Saving bill function called");
+// Comprehensive Debugging Function
+function debugProjections() {
+    console.group('Projection Debugging');
     
-    try {
-        // Get form values
-        const name = document.getElementById('bill-name').value;
-        const amount = parseFloat(document.getElementById('bill-amount').value);
-        const dueDate = new Date(document.getElementById('bill-due-date').value);
-        const frequency = document.getElementById('bill-frequency').value;
+    console.log('Current State:', {
+        month: currentState.month,
+        year: currentState.year,
+        view: currentState.view
+    });
+    
+    console.log('Visible Months:', visibleMonths);
+    
+    console.log('Bills Data:', billsData.map(bill => ({
+        name: bill.name,
+        amount: bill.amount,
+        frequency: bill.frequency,
+        dueDate: bill.dueDate,
+        fullKey: `${getMonthAbbreviation(bill.dueDate.getMonth())}-${bill.dueDate.getFullYear()}`
+    })));
+    
+    console.log('Monthly Projections:', {...monthlyProjections});
+    
+    // Check projection details for current months
+    visibleMonths.forEach(monthData => {
+        const key = monthData.key;
+        const projection = monthlyProjections[key] || 0;
         
-        console.log("Form values:", { name, amount, dueDate, frequency });
+        console.log(`Month ${key}:`, {
+            projection: projection,
+            matchingBills: billsData.filter(bill => {
+                const billMonth = getMonthAbbreviation(bill.dueDate.getMonth());
+                const billYear = bill.dueDate.getFullYear();
+                const billKey = `${billMonth}-${billYear}`;
+                return billKey === key;
+            }).map(bill => ({
+                name: bill.name,
+                amount: bill.amount,
+                frequency: bill.frequency,
+                dueDate: bill.dueDate
+            }))
+        });
+    });
+    
+    console.groupEnd();
+}
+
+window.addEventListener('error', function(event) {
+    console.error('Uncaught error:', event.error);
+});
+
+// Fix navigateMonth to correctly update displayed months/years
+function navigateMonth(direction) {
+    console.group('Month/Year Navigation');
+    
+    if (currentState.view === 'yearly') {
+        // For yearly view, navigate by years instead of months
+        const newYear = currentState.year + direction;
         
-        // Validate form
-        if (!name || isNaN(amount) || isNaN(dueDate.getTime()) || !frequency) {
-            console.log("Form validation failed");
-            alert('Please fill out all fields');
+        // Check if the new year is within the visible years range
+        const newYearKey = `Jan-${newYear}`;
+        const newYearIndex = visibleMonths.findIndex(m => m.key === newYearKey);
+        
+        if (newYearIndex === -1) {
+            console.log(`Year ${newYear} is not in visible range`);
+            console.groupEnd();
             return;
         }
         
-        // Create new bill
+        // Update current year
+        currentState.year = newYear;
+        
+        // Update displayed months to include the new year
+        updateDisplayedMonths();
+        createMonthTabs();
+        setupMonthTabListeners();
+    } else {
+        // Find current month's index in visible months
+        const currentMonthKey = `${currentState.month}-${currentState.year}`;
+        const currentIndex = visibleMonths.findIndex(m => m.key === currentMonthKey);
+        
+        if (currentIndex === -1) {
+            console.error("Current month not found in visible months");
+            console.groupEnd();
+            return;
+        }
+        
+        const newIndex = currentIndex + direction;
+        
+        // Check navigation bounds
+        if (newIndex < 0 || newIndex >= visibleMonths.length) {
+            console.log("Cannot navigate outside of visible range");
+            console.groupEnd();
+            return;
+        }
+        
+        // Get new month data
+        const newMonthData = visibleMonths[newIndex];
+        currentState.month = newMonthData.month;
+        currentState.year = newMonthData.year;
+        
+        // Ensure displayed months are updated if needed
+        const isInDisplayedMonths = displayedMonths.some(m => 
+            m.month === currentState.month && m.year === currentState.year
+        );
+        
+        if (!isInDisplayedMonths) {
+            updateDisplayedMonths();
+            createMonthTabs();
+            setupMonthTabListeners();
+        }
+    }
+    
+    console.log("New selection:", {
+        month: currentState.month,
+        year: currentState.year
+    });
+    
+    // Recalculate projections
+    recalculateYearlyProjections();
+    
+    // Update UI components
+    updateChart();
+    updateMonthDisplay();
+    updateBillsDisplay();
+    updateMonthTabAmounts();
+    updateActiveMonthTab();
+    
+    console.groupEnd();
+}
+
+// Add a global debugging function that can be called from console
+window.debugBillPlanner = function() {
+    debugProjections();
+};
+
+// Fix saveBill to properly update all data after saving
+function saveBill() {
+    console.group('Saving Bill');
+    
+    try {
+        // Get form values
+        const billName = document.getElementById('bill-name').value;
+        const billAmount = parseFloat(document.getElementById('bill-amount').value);
+        const billDueDate = new Date(document.getElementById('bill-due-date').value);
+        const billFrequency = document.getElementById('bill-frequency').value;
+        
+        // Validate form
+        if (!billName || isNaN(billAmount) || !billDueDate || !billFrequency) {
+            alert('Please fill in all fields correctly.');
+            console.error('Form validation failed');
+            console.groupEnd();
+            return;
+        }
+        
+        // Create bill object
         const newBill = {
-            id: billsData.length + 1,
-            name: name,
-            amount: amount,
-            dueDate: dueDate,
-            frequency: frequency,
-            icon: getIconForBill(name),
-            paid: false
+            id: Date.now(),
+            name: billName,
+            amount: billAmount,
+            dueDate: billDueDate,
+            frequency: billFrequency,
+            paid: false,
+            icon: getIconForBill(billName)
         };
         
-        console.log("New bill object:", newBill);
+        console.log('New bill:', newBill);
         
-        // Add bill to data
+        // Add to bills array
         billsData.push(newBill);
         
-        // Reset monthly projections to ensure clean calculation
-        monthlyProjections = {
-            'Mar': 0.00,
-            'Apr': 0.00,
-            'May': 0.00,
-            'Jun': 0.00
-        };
-        
-        // Recalculate all projections from scratch
-        console.log("Recalculating all projections");
-        billsData.forEach(bill => {
-            updateProjections(bill);
-        });
-        
-        // Force update the chart and UI
-        console.log("Forcing UI updates");
-        updateChart();
-        updateMonthTabAmounts();
-        updateMonthDisplay();
-        updateBillsDisplay();
-        
-        // Save data to localStorage
-        saveDataToStorage();
+        // Recalculate projections
+        recalculateYearlyProjections();
         
         // Close modal
         var modalElement = document.getElementById('add-bill-modal');
@@ -432,13 +845,22 @@ function saveBill() {
         // Reset form
         document.getElementById('add-bill-form').reset();
         
-        // Log final state
-        console.log("Final monthly projections:", {...monthlyProjections});
-        console.log("Bills data:", [...billsData]);
+        // Save to localStorage
+        saveDataToStorage();
+        
+        // Update UI
+        updateChart();
+        updateMonthTabAmounts();
+        updateBillsDisplay();
+        updateMonthDisplay();
+        
+        console.log('Bill saved successfully');
     } catch (error) {
-        console.error("Error saving bill:", error);
-        alert("An error occurred while saving the bill. Please try again.");
+        console.error('Error saving bill:', error);
+        alert('Failed to save bill. Please try again.');
     }
+    
+    console.groupEnd();
 }
 
 // Get icon for bill based on name
@@ -470,80 +892,143 @@ function getIconHTML(bill) {
     }
 }
 
-// Update projections based on new bill
+// Fix for updateProjections function to properly handle yearly view
 function updateProjections(bill) {
-    console.log("Updating projections for bill:", bill);
+    console.group(`Projecting Bill: ${bill.name}`);
+    console.log('Bill details:', {
+        name: bill.name,
+        amount: bill.amount,
+        frequency: bill.frequency,
+        dueDate: bill.dueDate,
+        currentView: currentState.view
+    });
     
-    // For monthly bills, add to all months
-    if (bill.frequency === "monthly") {
-        console.log("Processing monthly bill");
-        for (let monthKey in monthlyProjections) {
-            console.log(`Adding ${bill.amount} to ${monthKey}`);
-            monthlyProjections[monthKey] += bill.amount;
-        }
-    } else if (bill.frequency === "one-time") {
-        // Map short month names to month indices
-        const monthMap = {
-            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-        };
-        
-        // Map month indices to short month names
-        const indexToMonth = Object.keys(monthMap).reduce((acc, month) => {
-            acc[monthMap[month]] = month;
-            return acc;
-        }, {});
-        
-        // Get month of the bill
-        const billMonth = bill.dueDate.getMonth();
-        const monthKey = indexToMonth[billMonth];
-        console.log("One-time bill for month:", monthKey);
-        
-        if (monthlyProjections.hasOwnProperty(monthKey)) {
-            monthlyProjections[monthKey] += bill.amount;
-        }
-    } else if (bill.frequency === "weekly") {
-        // For weekly bills, add to all months with 4 occurrences
-        for (let monthKey in monthlyProjections) {
-            console.log(`Adding weekly bill (${bill.amount} × 4) to ${monthKey}`);
-            monthlyProjections[monthKey] += bill.amount * 4;
-        }
-    } else if (bill.frequency === "yearly") {
-        // Map month indices
-        const monthMap = {
-            'Jan': 0, 'Feb': 1, 'Mar': 2, 'Apr': 3, 'May': 4, 'Jun': 5,
-            'Jul': 6, 'Aug': 7, 'Sep': 8, 'Oct': 9, 'Nov': 10, 'Dec': 11
-        };
-        
-        // Map month indices to short month names
-        const indexToMonth = Object.keys(monthMap).reduce((acc, month) => {
-            acc[monthMap[month]] = month;
-            return acc;
-        }, {});
-        
-        // Get month of the bill
-        const billMonth = bill.dueDate.getMonth();
-        const monthKey = indexToMonth[billMonth];
-        console.log("Yearly bill for month:", monthKey);
-        
-        if (monthlyProjections.hasOwnProperty(monthKey)) {
-            monthlyProjections[monthKey] += bill.amount;
-        }
-    }
+    // Create a deep copy of visibleMonths to ensure we're working with the full range
+    const processMonths = [...visibleMonths];
     
-    console.log("Updated projections:", {...monthlyProjections});
+    processMonths.forEach(monthData => {
+        const key = monthData.key;
+        const monthYear = key.split('-');
+        const month = monthYear[0];
+        const year = parseInt(monthYear[1]);
+        
+        // Ensure the key exists in projections
+        if (!monthlyProjections.hasOwnProperty(key)) {
+            monthlyProjections[key] = 0;
+        }
+        
+        // Get bill details
+        const billYear = bill.dueDate.getFullYear();
+        const billMonth = getMonthAbbreviation(bill.dueDate.getMonth());
+        
+        // Determine if bill applies to this month/year based on frequency
+        let shouldAddToProjection = false;
+        let amountToAdd = bill.amount;
+        
+        switch(bill.frequency) {
+            case "one-time":
+                // Only add to the exact month/year
+                shouldAddToProjection = (billMonth === month && billYear === year);
+                break;
+                
+            case "monthly":
+                // Add to all months
+                shouldAddToProjection = true;
+                break;
+                
+            case "weekly":
+                // Add to all months (4 weeks per month)
+                shouldAddToProjection = true;
+                amountToAdd = bill.amount * 4; // 4 weeks per month
+                break;
+                
+            case "yearly":
+                // Add to the specific month each year
+                shouldAddToProjection = (billMonth === month && billYear === year);
+                break;
+                
+            default:
+                console.warn(`Unknown bill frequency: ${bill.frequency}`);
+                break;
+        }
+        
+        // Add to projection if applicable
+        if (shouldAddToProjection) {
+            monthlyProjections[key] += amountToAdd;
+            console.log(`Adding ${amountToAdd} to ${key} for ${bill.name}`);
+        }
+    });
     
-    // Force UI update
-    updateChart();
-    updateMonthTabAmounts();
+    console.log('Updated Projections:', {...monthlyProjections});
+    console.groupEnd();
 }
 
-// Update month tab amounts
+
+// Fix updateMonthTabAmounts to properly update the month tab amounts
 function updateMonthTabAmounts() {
-    document.getElementById('mar-amount').textContent = `$${monthlyProjections['Mar'].toFixed(2)}`;
-    document.getElementById('apr-amount').textContent = `$${monthlyProjections['Apr'].toFixed(2)}`;
-    document.getElementById('may-amount').textContent = `$${monthlyProjections['May'].toFixed(2)}`;
-    document.getElementById('jun-amount').textContent = `$${monthlyProjections['Jun'].toFixed(2)}`;
+    console.group('Updating Month Tab Amounts');
+    
+    // Force recalculation of projections to ensure they're up to date
+    recalculateYearlyProjections();
+    
+    // Update each month tab with the current projection amount
+    document.querySelectorAll('.month-tab').forEach(tab => {
+        const key = tab.getAttribute('data-key');
+        const amountElement = tab.querySelector('.amount');
+        
+        if (amountElement && monthlyProjections[key] !== undefined) {
+            const amount = monthlyProjections[key];
+            amountElement.textContent = `$${amount.toFixed(2)}`;
+            console.log(`Updated tab ${key} amount: $${amount.toFixed(2)}`);
+        } else {
+            console.warn(`Could not update tab amount for key: ${key}`);
+        }
+    });
+    
+    // Update the current month's estimated amount
+    const currentKey = `${currentState.month}-${currentState.year}`;
+    const estimatedAmount = monthlyProjections[currentKey] || 0;
+    
+    const estimatedElement = document.getElementById('estimated-amount');
+    if (estimatedElement) {
+        estimatedElement.textContent = `$${estimatedAmount.toFixed(2)}`;
+        console.log(`Updated estimated amount: $${estimatedAmount.toFixed(2)}`);
+    }
+    
+    console.groupEnd();
+}
+
+// Fix handleViewChange function to properly update when switching views
+function handleViewChange(viewType) {
+    console.group('View Change');
+    console.log(`Changing view to: ${viewType}`);
+    
+    // Update the current view
+    currentState.view = viewType;
+    
+    // Update the dropdown button text
+    document.querySelector('.dropdown-trigger[data-target="month-dropdown"] span').textContent = 
+        viewType.charAt(0).toUpperCase() + viewType.slice(1);
+    
+    // Update visible date range based on the new view
+    updateVisibleDateRange();
+    
+    // Recalculate projections for the new view
+    recalculateYearlyProjections();
+    
+    // Update displayed months and redraw the UI
+    updateDisplayedMonths();
+    createMonthTabs();
+    setupMonthTabListeners();
+    
+    // Update chart and display
+    updateChart();
+    updateMonthDisplay();
+    updateBillsDisplay();
+    updateMonthTabAmounts();
+    
+    console.log('View change complete');
+    console.groupEnd();
 }
 
 // Get days until due
@@ -583,7 +1068,94 @@ function formatDueDate(dueDate, daysUntilDue) {
     return `${dueText} • ${dayName} ${date} ${monthName}`;
 }
 
-// Render bills list
+// Fix for the yearly projections to properly project recurring bills into future years
+function recalculateYearlyProjections() {
+    console.group('Recalculating Yearly Projections');
+    
+    // First, reset all projections to zero
+    visibleMonths.forEach(monthData => {
+        monthlyProjections[monthData.key] = 0;
+    });
+    
+    // For each bill, calculate its contribution to each month/year
+    billsData.forEach(bill => {
+        const billYear = bill.dueDate.getFullYear();
+        const billMonth = getMonthAbbreviation(bill.dueDate.getMonth());
+        
+        visibleMonths.forEach(monthData => {
+            const [month, year] = monthData.key.split('-');
+            const yearNum = parseInt(year);
+            
+            // For yearly view, we need to handle bills differently
+            if (currentState.view === 'yearly') {
+                if (bill.frequency === 'one-time') {
+                    // One-time bills only appear in their specific year
+                    if (yearNum === billYear) {
+                        monthlyProjections[monthData.key] += bill.amount;
+                        console.log(`Adding one-time bill ${bill.name} ($${bill.amount}) to ${monthData.key}`);
+                    }
+                } else if (bill.frequency === 'monthly') {
+                    // Monthly bills appear in every year - add monthly × 12
+                    // For future years, add monthly bills if bill was created before that year
+                    if (yearNum >= billYear) {
+                        monthlyProjections[monthData.key] += (bill.amount * 12);
+                        console.log(`Adding monthly bill ${bill.name} ($${bill.amount * 12}) to ${monthData.key}`);
+                    }
+                } else if (bill.frequency === 'weekly') {
+                    // Weekly bills appear in every year - add weekly × 52
+                    // For future years, add weekly bills if bill was created before that year
+                    if (yearNum >= billYear) {
+                        monthlyProjections[monthData.key] += (bill.amount * 52);
+                        console.log(`Adding weekly bill ${bill.name} ($${bill.amount * 52}) to ${monthData.key}`);
+                    }
+                } else if (bill.frequency === 'yearly') {
+                    // Yearly bills appear in every year from their start date
+                    if (yearNum >= billYear) {
+                        monthlyProjections[monthData.key] += bill.amount;
+                        console.log(`Adding yearly bill ${bill.name} ($${bill.amount}) to ${monthData.key}`);
+                    }
+                }
+            } else {
+                // For monthly view, handle bills based on their frequency
+                switch(bill.frequency) {
+                    case 'one-time':
+                        // One-time bills only appear in their specific month/year
+                        if (month === billMonth && yearNum === billYear) {
+                            monthlyProjections[monthData.key] += bill.amount;
+                        }
+                        break;
+                    case 'monthly':
+                        // Monthly bills appear in every month after their start date
+                        if (yearNum > billYear || 
+                            (yearNum === billYear && getMonthIndex(month) >= bill.dueDate.getMonth())) {
+                            monthlyProjections[monthData.key] += bill.amount;
+                        }
+                        break;
+                    case 'weekly':
+                        // Weekly bills appear in every month after their start date
+                        if (yearNum > billYear || 
+                            (yearNum === billYear && getMonthIndex(month) >= bill.dueDate.getMonth())) {
+                            monthlyProjections[monthData.key] += (bill.amount * 4);
+                        }
+                        break;
+                    case 'yearly':
+                        // Yearly bills appear in the same month each year after start date
+                        if (month === billMonth && yearNum >= billYear) {
+                            monthlyProjections[monthData.key] += bill.amount;
+                        }
+                        break;
+                }
+            }
+        });
+    });
+    
+    console.log('Final calculated projections:', {...monthlyProjections});
+    console.groupEnd();
+    
+    return monthlyProjections;
+}
+
+// Enhanced renderBillsList to show display names for recurring bills
 function renderBillsList(bills) {
     const container = document.getElementById('bills-list-container');
     if (!container) {
@@ -616,7 +1188,7 @@ function renderBillsList(bills) {
                     <div class="due-date">${dueDateStr}</div>
                     <div class="bill-info">
                         <div class="bill-icon ${bill.icon}">${getIconHTML(bill)}</div>
-                        <div class="bill-name">${bill.name}</div>
+                        <div class="bill-name">${bill.displayName || bill.name}</div>
                         <div class="bill-amount">$${bill.amount.toFixed(2)}</div>
                     </div>
                 </div>
@@ -638,71 +1210,183 @@ function saveDataToStorage() {
             dueDate: bill.dueDate.toISOString()
         }));
         
+        // Save bills data (this is the primary data source)
         localStorage.setItem('billPlannerData', JSON.stringify(billsToSave));
-        localStorage.setItem('billPlannerProjections', JSON.stringify(monthlyProjections));
-        console.log("Data saved to localStorage");
+        
+        // Save state (view type, current month/year)
+        localStorage.setItem('billPlannerState', JSON.stringify(currentState));
+        
+        // Save current visible months configuration
+        localStorage.setItem('billPlannerVisibleMonths', JSON.stringify(visibleMonths));
+        
+        // We don't save projections since they're calculated from bills
+        
+        console.log("Data saved to localStorage", {
+            bills: billsToSave.length,
+            state: currentState,
+            visibleMonths: visibleMonths.length
+        });
     } catch (error) {
         console.error("Error saving data to localStorage:", error);
     }
 }
 
-// Load data from localStorage
+// Fix loadDataFromStorage to properly handle loading saved data
 function loadDataFromStorage() {
     try {
+        console.group('Loading Data from Storage');
+        
         const savedBills = localStorage.getItem('billPlannerData');
-        const savedProjections = localStorage.getItem('billPlannerProjections');
+        const savedState = localStorage.getItem('billPlannerState');
         
+        // Reset all data structures
+        billsData = [];
+        
+        // Restore state if exists
+        if (savedState) {
+            const loadedState = JSON.parse(savedState);
+            currentState = loadedState;
+            console.log('Restored state:', currentState);
+        }
+        
+        // Update visible date range
+        updateVisibleDateRange();
+        
+        // Load bills
         if (savedBills) {
-            // Parse the bills and convert ISO date strings back to Date objects
-            const parsedBills = JSON.parse(savedBills);
-            billsData = parsedBills.map(bill => ({
-                ...bill,
-                dueDate: new Date(bill.dueDate)
-            }));
-            console.log("Loaded bills from localStorage:", billsData);
+            try {
+                const parsedBills = JSON.parse(savedBills);
+                billsData = parsedBills.map(bill => ({
+                    ...bill,
+                    dueDate: new Date(bill.dueDate)
+                }));
+                
+                console.log('Loaded bills:', billsData);
+            } catch (parseError) {
+                console.error('Error parsing saved bills:', parseError);
+                billsData = [];
+            }
         }
         
-        if (savedProjections) {
-            monthlyProjections = JSON.parse(savedProjections);
-            console.log("Loaded projections from localStorage:", monthlyProjections);
-        }
-    } catch (error) {
-        console.error("Error loading data from localStorage:", error);
-        // If there's an error, reset to defaults
-        billsData = [];
-        monthlyProjections = {
-            'Mar': 0.00,
-            'Apr': 0.00,
-            'May': 0.00,
-            'Jun': 0.00
-        };
-    }
-}
-
-// Reset all data
-function resetAllData() {
-    if (confirm("Are you sure you want to reset all data? This cannot be undone.")) {
-        billsData = [];
-        monthlyProjections = {
-            'Mar': 0.00,
-            'Apr': 0.00,
-            'May': 0.00,
-            'Jun': 0.00
-        };
+        // Calculate projections
+        recalculateYearlyProjections();
         
-        // Clear localStorage
-        localStorage.removeItem('billPlannerData');
-        localStorage.removeItem('billPlannerProjections');
-        
-        // Update UI
-        updateChart();
+        // Update UI components
+        updateDisplayedMonths();
+        createMonthTabs();
+        setupMonthTabListeners();
+        initChart();
         updateMonthTabAmounts();
         updateMonthDisplay();
         updateBillsDisplay();
         
-        alert("All data has been reset");
+        console.groupEnd();
+    } catch (error) {
+        console.error('Error in loadDataFromStorage:', error);
+        alert('There was an error loading your saved data. Starting with a clean slate.');
         
-        // Force reload the page to ensure everything is reset
-        window.location.reload();
+        // Reset to defaults
+        billsData = [];
+        const currentDate = new Date();
+        currentState = {
+            month: getMonthAbbreviation(currentDate.getMonth()),
+            year: currentDate.getFullYear(),
+            view: 'monthly'
+        };
+        updateVisibleDateRange();
+        recalculateYearlyProjections();
     }
 }
+
+// Modify resetAllData to ensure clean slate
+function resetAllData() {
+    if (confirm("Are you sure you want to reset all data? This cannot be undone.")) {
+        console.group('Resetting All Data');
+        
+        // Complete reset of all data structures
+        billsData = [];
+        monthlyProjections = {};
+        
+        // Reset to current date and monthly view
+        const currentDate = new Date();
+        currentState = {
+            month: getMonthAbbreviation(currentDate.getMonth()),
+            year: currentDate.getFullYear(),
+            view: 'monthly'
+        };
+        
+        // Update visible date range and initialize clean projections
+        updateVisibleDateRange();
+        initializeProjections();
+        
+        // Clear localStorage
+        localStorage.removeItem('billPlannerData');
+        localStorage.removeItem('billPlannerProjections');
+        localStorage.removeItem('billPlannerState');
+        
+        // Update UI components
+        updateDisplayedMonths();
+        createMonthTabs();
+        setupMonthTabListeners();
+        initChart();
+        updateMonthTabAmounts();
+        updateMonthDisplay();
+        updateBillsDisplay();
+        
+        console.log('Data reset complete');
+        console.groupEnd();
+        
+        alert("All data has been reset");
+    }
+}
+
+// Add initialization code to ensure console logs work
+document.addEventListener('DOMContentLoaded', function() {
+    // Enable verbose console logging
+    debugLog('Bill Planner initialized');
+    debugLog('Current date:', new Date());
+    
+    // Override console methods to ensure they display
+    const originalLog = console.log;
+    console.log = function() {
+        const args = Array.from(arguments);
+        setTimeout(originalLog.bind(console, ...args), 0);
+    };
+    
+    const originalError = console.error;
+    console.error = function() {
+        const args = Array.from(arguments);
+        setTimeout(originalError.bind(console, ...args), 0);
+    };
+    
+    const originalWarn = console.warn;
+    console.warn = function() {
+        const args = Array.from(arguments);
+        setTimeout(originalWarn.bind(console, ...args), 0);
+    };
+    
+    const originalInfo = console.info;
+    console.info = function() {
+        const args = Array.from(arguments);
+        setTimeout(originalInfo.bind(console, ...args), 0);
+    };
+    
+    // Add global debugging function
+    window.debugBillPlanner = function() {
+        debugLog('Manual debug triggered');
+        debugLog('Current state:', currentState);
+        debugLog('Bills data:', billsData);
+        debugLog('Monthly projections:', {...monthlyProjections});
+        debugLog('Visible months:', visibleMonths);
+        debugLog('Displayed months:', displayedMonths);
+    };
+    
+    // Force recalculation on page load
+    setTimeout(function() {
+        recalculateYearlyProjections();
+        updateMonthTabAmounts();
+        updateMonthDisplay();
+        updateBillsDisplay();
+        updateChart();
+    }, 1000);
+});
