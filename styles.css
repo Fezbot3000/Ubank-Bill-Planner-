@@ -1,0 +1,368 @@
+:root {
+    --primary-color: #00e676;
+    --text-color: #0d1b2a;
+    --light-gray: #f5f7fa;
+    --medium-gray: #e1e5eb;
+    --dark-gray: #8d99ae;
+    --spotify-green: #1DB954;
+    --netflix-red: #E50914;
+    --optus-yellow: #FFC400;
+}
+
+body {
+    font-family: 'Roboto', sans-serif;
+    background-color: #f5f7fa;
+    color: var(--text-color);
+    margin: 0;
+    padding: 0;
+    max-width: 500px;
+    margin: 0 auto;
+    position: relative;
+    height: 100vh;
+}
+
+.header {
+    background-color: white;
+    padding: 16px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.nav-wrapper {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-wrapper h4 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.app-title {
+    font-size: 24px;
+    font-weight: bold;
+    margin: 16px 0;
+}
+
+.add-bill-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border-radius: 50px;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-weight: 500;
+    margin: 16px 0;
+    border: none;
+    width: 100%;
+    height: 48px;
+}
+
+.add-bill-btn i {
+    margin-right: 8px;
+}
+
+.chart-container {
+    margin: 16px 0;
+    padding: 16px;
+    background-color: white;
+    border-radius: 8px;
+    height: 200px;
+}
+
+.month-navigation {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 16px 0;
+}
+
+.month-tabs {
+    display: flex;
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-width: none;
+    margin: 16px 0;
+}
+
+.month-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.month-tab {
+    min-width: 80px;
+    height: 72px;
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-right: 8px;
+    background-color: var(--medium-gray);
+    color: var(--text-color);
+    cursor: pointer;
+}
+
+.month-tab.active {
+    background-color: #6200ee;
+    color: white;
+}
+
+.month-tab .amount {
+    font-size: 18px;
+    font-weight: 500;
+    margin-bottom: 4px;
+}
+
+.month-tab .month {
+    font-size: 14px;
+}
+
+.bills-container {
+    padding: 16px;
+    background-color: white;
+    border-radius: 8px 8px 0 0;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.estimated-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    font-weight: 500;
+}
+
+.estimated-section .amount {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.upcoming-bills {
+    margin-bottom: 16px;
+}
+
+.upcoming-count {
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 16px;
+}
+
+.bill-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px;
+    position: relative;
+}
+
+.bill-status {
+    min-width: 20px;
+    margin-right: 12px;
+}
+
+.bill-status .status-dot {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background-color: #6200ee;
+}
+
+.bill-status .status-line {
+    width: 2px;
+    height: 100%;
+    background-color: var(--medium-gray);
+    position: absolute;
+    top: 16px;
+    left: 7px;
+    bottom: 0;
+}
+
+.bill-status .status-empty {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid var(--medium-gray);
+    background-color: white;
+}
+
+.bill-content {
+    flex: 1;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--medium-gray);
+}
+
+.bill-content .due-date {
+    font-size: 14px;
+    color: var(--dark-gray);
+    margin-bottom: 8px;
+}
+
+.bill-info {
+    display: flex;
+    align-items: center;
+}
+
+.bill-icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+    color: white;
+    font-weight: 500;
+}
+
+.bill-icon.spotify {
+    background-color: var(--spotify-green);
+}
+
+.bill-icon.netflix {
+    background-color: var(--netflix-red);
+}
+
+.bill-icon.optus {
+    background-color: var(--optus-yellow);
+    color: black;
+}
+
+.bill-icon.date {
+    background-color: #5e35b1;
+}
+
+.bill-name {
+    flex: 1;
+    font-size: 16px;
+    font-weight: 500;
+}
+
+.bill-amount {
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.footer-note {
+    padding: 16px;
+    text-align: center;
+    color: var(--dark-gray);
+    font-size: 14px;
+}
+
+.empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 32px 16px;
+}
+
+.empty-state p {
+    margin-bottom: 24px;
+    color: var(--dark-gray);
+}
+
+.empty-add-btn {
+    display: flex;
+    align-items: center;
+    color: #6200ee;
+    cursor: pointer;
+}
+
+.empty-add-btn i {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: #f1e5ff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 12px;
+}
+
+/* Modal styles */
+.modal {
+    max-width: 500px;
+    border-radius: 8px;
+}
+
+.modal .modal-content {
+    padding: 24px;
+}
+
+.modal .modal-footer {
+    padding: 16px 24px;
+}
+
+.modal h4 {
+    margin-top: 0;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+.input-field label {
+    color: var(--dark-gray);
+}
+
+.input-field input:focus + label {
+    color: #6200ee !important;
+}
+
+.input-field input:focus {
+    border-bottom: 1px solid #6200ee !important;
+    box-shadow: 0 1px 0 0 #6200ee !important;
+}
+
+.modal-btn {
+    background-color: #6200ee;
+    color: white;
+    border-radius: 4px;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 16px;
+    text-transform: none;
+    font-weight: 500;
+}
+
+.modal-btn-cancel {
+    background-color: transparent;
+    color: #6200ee;
+    border-radius: 4px;
+    height: 36px;
+    line-height: 36px;
+    padding: 0 16px;
+    text-transform: none;
+    font-weight: 500;
+}
+
+/* Hide arrow buttons on number input */
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none; 
+    margin: 0; 
+}
+
+input[type=number] {
+    -moz-appearance: textfield;
+}
+
+.settings-icon {
+    color: var(--text-color);
+    padding: 8px;
+}
+
+.back-btn {
+    color: var(--text-color);
+    padding: 8px;
+}
+
+.dropdown-content {
+    width: auto !important;
+}

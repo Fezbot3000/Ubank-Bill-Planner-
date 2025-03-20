@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bill Planner</title>
+    <!-- Material Design Icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <!-- Material Design Components -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css" rel="stylesheet">
+    <!-- Chart.js for the graph -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <!-- Custom CSS -->
+    <link href="styles.css" rel="stylesheet">
+</head>
+<body>
+    <div class="header">
+        <div class="nav-wrapper">
+            <a href="#" class="back-btn"><i class="fas fa-chevron-left"></i></a>
+            <div class="dropdown-trigger" data-target="month-dropdown">
+                <span>Monthly <i class="fas fa-chevron-down"></i></span>
+            </div>
+            <a href="#" class="settings-icon dropdown-trigger" data-target="settings-dropdown"><i class="fas fa-cog"></i></a>
+        </div>
+        <!-- Dropdown Structure -->
+        <ul id="month-dropdown" class="dropdown-content">
+            <li><a href="#!">Weekly</a></li>
+            <li><a href="#!">Monthly</a></li>
+            <li><a href="#!">Yearly</a></li>
+        </ul>
+        <!-- Settings Dropdown -->
+        <ul id="settings-dropdown" class="dropdown-content">
+            <li><a href="#!" id="reset-data-btn">Reset All Data</a></li>
+        </ul>
+    </div>
+
+    <div class="container" style="width: 100%; padding: 0 16px; max-width: 100%;">
+        <h1 class="app-title">Bill Planner</h1>
+        
+        <button class="add-bill-btn" id="add-bill-button" type="button">
+            <i class="fas fa-plus"></i> Track new bill
+        </button>
+
+        <div class="chart-container">
+            <canvas id="billChart"></canvas>
+        </div>
+
+        <div class="month-tabs">
+            <div class="month-tab active" data-month="Mar">
+                <div class="amount" id="mar-amount">$0.00</div>
+                <div class="month">Mar</div>
+            </div>
+            <div class="month-tab" data-month="Apr">
+                <div class="amount" id="apr-amount">$0.00</div>
+                <div class="month">Apr</div>
+            </div>
+            <div class="month-tab" data-month="May">
+                <div class="amount" id="may-amount">$0.00</div>
+                <div class="month">May</div>
+            </div>
+            <div class="month-tab" data-month="Jun">
+                <div class="amount" id="jun-amount">$0.00</div>
+                <div class="month">Jun</div>
+            </div>
+        </div>
+
+        <div class="month-navigation">
+            <a href="#" class="prev-month"><i class="fas fa-chevron-left"></i></a>
+            <span id="current-month">March 2025</span>
+            <a href="#" class="next-month"><i class="fas fa-chevron-right"></i></a>
+        </div>
+
+        <div class="bills-container" id="bills-container">
+            <div id="bills-content" style="display: none;">
+                <div class="estimated-section">
+                    <div class="estimated-label">Estimated left to pay</div>
+                    <div class="amount" id="estimated-amount">$0.00</div>
+                </div>
+
+                <div class="upcoming-bills">
+                    <div class="upcoming-count" id="upcoming-count">0 coming up</div>
+                    <div id="bills-list-container">
+                        <!-- Bills will be dynamically rendered here -->
+                    </div>
+                </div>
+            </div>
+
+            <div id="empty-state" style="display: block;">
+                <div class="empty-state">
+                    <p>No bills this month</p>
+                    <div class="empty-add-btn" id="empty-add-button">
+                        <i class="fas fa-plus"></i>
+                        <span>Track new bill</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="footer-note">
+                These details are estimated, check your bill to see the exact amount and due date
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Bill Modal -->
+    <div id="add-bill-modal" class="modal">
+        <div class="modal-content">
+            <h4>Track New Bill</h4>
+            <div class="row">
+                <form id="add-bill-form">
+                    <div class="input-field col s12">
+                        <input id="bill-name" type="text" required>
+                        <label for="bill-name">Bill Name</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="bill-amount" type="number" step="0.01" required>
+                        <label for="bill-amount">Amount ($)</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <input id="bill-due-date" type="date" required>
+                        <label for="bill-due-date" class="active">Due Date</label>
+                    </div>
+                    <div class="input-field col s12">
+                        <select id="bill-frequency" required>
+                            <option value="" disabled selected>Select frequency</option>
+                            <option value="one-time">One-time</option>
+                            <option value="weekly">Weekly</option>
+                            <option value="monthly">Monthly</option>
+                            <option value="yearly">Yearly</option>
+                        </select>
+                        <label>Frequency</label>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <a href="#!" class="modal-close waves-effect waves-light btn-flat modal-btn-cancel">Cancel</a>
+            <a href="#!" id="save-bill-btn" onclick="saveBill()" class="waves-effect waves-light btn modal-btn">Save</a>
+        </div>
+    </div>
+
+    <!-- Materialize JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <!-- Custom JS -->
+    <script src="script.js"></script>
+</body>
+</html>
